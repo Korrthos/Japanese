@@ -132,12 +132,8 @@ class ViewPitchAccentsDialog(AnkiSaveAndRestoreGeomDialog):
 
     def done(self, result: int) -> None:
         # https://doc.qt.io/qt-6/qdialog.html#done
-        self.on_close()
-        return super().done(result)
-
-    def on_close(self) -> None:
         print("closing AJT lookup window...")
-        self._pronunciations.clear()
+        return super().done(result)
 
 
 def get_parent_widget(parent: QWidget) -> QWidget:
