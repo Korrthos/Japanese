@@ -102,7 +102,7 @@ def entry_to_moras(entry: FormattedEntry) -> MoraSequence:
     moras = html_notation_to_moras(entry.html_notation)
     pitch_type = pitch_type_from_pitch_num(entry.pitch_number, len(moras))
     if pitch_type == PitchType.heiban or len(moras) == 1:
-        assert pitch_type in (PitchType.heiban, PitchType.atamadaka)
+        assert pitch_type in (PitchType.heiban, PitchType.atamadaka), f"pitch should be heiban or atamadaka: {entry}"
         level = PitchLevel.high if pitch_type == PitchType.heiban else PitchLevel.low
         moras.append(Mora(txt=[], level=level, flags=MoraFlag.trailing))
 
