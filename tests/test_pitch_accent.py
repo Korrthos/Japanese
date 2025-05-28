@@ -22,6 +22,7 @@ from japanese.pitch_accents.format_accents import format_entry
 def test_pitch_accent_entry() -> None:
     entry = PitchAccentEntry.from_formatted(
         FormattedEntry(
+            raw_headword="楽しい",
             katakana_reading="たのしい",
             pitch_number="3",
             html_notation="たのしい",
@@ -41,6 +42,7 @@ def test_pitch_accent_entry() -> None:
 
     entry = PitchAccentEntry.from_formatted(
         FormattedEntry(
+            raw_headword="納屋",
             katakana_reading="なや",
             pitch_number="0,1",
             html_notation="なや",

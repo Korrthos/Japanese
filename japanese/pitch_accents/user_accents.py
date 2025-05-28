@@ -79,6 +79,7 @@ def formatted_from_tsv_row(row_dict: UserAccDictRawTSVEntry) -> typing.Sequence[
     row_dict["katakana_reading"] = to_katakana(row_dict["katakana_reading"])
     return dict.fromkeys(
         FormattedEntry(
+            raw_headword=row_dict["headword"],
             katakana_reading=row_dict["katakana_reading"],
             html_notation=format_entry(kana_to_moras(row_dict["katakana_reading"]), pitch_num),
             pitch_number=str(pitch_num),
@@ -92,7 +93,8 @@ def iter_user_formatted_rows(tsv_file_path: pathlib.Path) -> typing.Iterable[Acc
     for row_dict in read_user_tsv_entries(tsv_file_path):
         for formatted in formatted_from_tsv_row(row_dict):
             yield AccDictRawTSVEntry(
-                headword=row_dict["headword"],
+                headword=to_katakana(row_dict["headword"]),
+                raw_headword=row_dict["headword"],
                 katakana_reading=formatted.katakana_reading,
                 html_notation=formatted.html_notation,
                 pitch_number=formatted.pitch_number,

@@ -50,11 +50,13 @@ def test_user_tsv_reader(fake_tsv) -> None:
             UserAccDictRawTSVEntry(headword="遙遙", katakana_reading="はるばる", pitch_numbers="3,2"),
             (
                 FormattedEntry(
+                    raw_headword="遙遙",
                     katakana_reading="ハルバル",
                     pitch_number="3",
                     html_notation="<low_rise>ハ</low_rise><high_drop>ルバ</high_drop><low>ル</low>",
                 ),
                 FormattedEntry(
+                    raw_headword="遙遙",
                     katakana_reading="ハルバル",
                     pitch_number="2",
                     html_notation="<low_rise>ハ</low_rise><high_drop>ル</high_drop><low>バル</low>",
@@ -65,6 +67,7 @@ def test_user_tsv_reader(fake_tsv) -> None:
             UserAccDictRawTSVEntry(headword="溝渠", katakana_reading="コウキョ", pitch_numbers="1"),
             (
                 FormattedEntry(
+                    raw_headword="溝渠",
                     katakana_reading="コウキョ",
                     pitch_number="1",
                     html_notation="<high_drop>コ</high_drop><low>ウキョ</low>",

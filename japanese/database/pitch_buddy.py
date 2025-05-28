@@ -1,16 +1,18 @@
 # Copyright: Ajatt-Tools and contributors; https://github.com/Ajatt-Tools
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 import abc
+import sqlite3
 import typing
 from collections.abc import Sequence
 from typing import Optional
 
 from ..pitch_accents.common import AccDictRawTSVEntry
-from .basic_types import Sqlite3BuddyABC, cursor_buddy
+from .basic_types import Sqlite3BuddyABC, Sqlite3BuddyVersionError, cursor_buddy
 
 PITCH_TABLES_SCHEMA: typing.Final[str] = """
 CREATE TABLE IF NOT EXISTS pitch_accents_formatted(
     headword         TEXT    NOT NULL,
+    raw_headword     TEXT    NOT NULL,
     katakana_reading TEXT    NOT NULL,
     html_notation    TEXT    NOT NULL,
     pitch_number     TEXT    NOT NULL,
@@ -60,34 +62,24 @@ class PitchSqlite3Buddy(Sqlite3BuddyABC, abc.ABC):
     def insert_pitch_accent_data(self, rows: typing.Iterable[AccDictRawTSVEntry], provider_name: str) -> None:
         query = """
         INSERT INTO pitch_accents_formatted
-        (headword, katakana_reading, html_notation, pitch_number, frequency, source)
-        VALUES(?, ?, ?, ?, ?, ?);
+        ( headword, raw_headword, katakana_reading, html_notation, pitch_number, frequency, source )
+        VALUES(:headword, :raw_headword, :katakana_reading, :html_notation, :pitch_number, :frequency, :source);
         """
         with cursor_buddy(self.con) as cur:
             cur.executemany(
                 query,
-                (
-                    (
-                        row["headword"],
-                        row["katakana_reading"],
-                        row["html_notation"],
-                        row["pitch_number"],
-                        int(row["frequency"]),
-                        provider_name,
-                    )
-                    for row in rows
-                ),
+                ((row | {"frequency": int(row["frequency"]), "source": provider_name}) for row in rows),
             )
             self.con.commit()
 
-    PITCH_RETRIEVE_KEYS = ("katakana_reading", "html_notation", "pitch_number")
+    PITCH_RETRIEVE_KEYS = ("raw_headword", "katakana_reading", "html_notation", "pitch_number")
 
     def search_pitch_accents(
         self,
         word: Optional[str],
         prefer_provider_name: str,
         select_keys: Sequence[str] = PITCH_RETRIEVE_KEYS,
-    ) -> list[Sequence[str]]:
+    ) -> list[sqlite3.Row]:
         # The user overrides the default (bundled) rows with their own data.
         # Return relevant rows from the user's data if they can be found.
         # Otherwise, return all results for the target word.

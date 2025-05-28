@@ -57,20 +57,31 @@ class TestAccDictManager:
         result = r.look_up("僕")
         assert list(result) == [
             FormattedEntry(
-                katakana_reading="ボク", html_notation="<low_rise>ボ</low_rise><high>ク</high>", pitch_number="0"
+                raw_headword="僕",
+                katakana_reading="ボク",
+                html_notation="<low_rise>ボ</low_rise><high>ク</high>",
+                pitch_number="0",
             ),
             FormattedEntry(
-                katakana_reading="ボク", html_notation="<high_drop>ボ</high_drop><low>ク</low>", pitch_number="1"
+                raw_headword="僕",
+                katakana_reading="ボク",
+                html_notation="<high_drop>ボ</high_drop><low>ク</low>",
+                pitch_number="1",
             ),
             FormattedEntry(
-                katakana_reading="シモベ", html_notation="<low_rise>シ</low_rise><high>モベ</high>", pitch_number="0"
+                raw_headword="僕",
+                katakana_reading="シモベ",
+                html_notation="<low_rise>シ</low_rise><high>モベ</high>",
+                pitch_number="0",
             ),
             FormattedEntry(
+                raw_headword="僕",
                 katakana_reading="シモベ",
                 html_notation="<low_rise>シ</low_rise><high_drop>モベ</high_drop>",
                 pitch_number="3",
             ),
             FormattedEntry(
+                raw_headword="僕",
                 katakana_reading="ヤツガレ",
                 html_notation="<low_rise>ヤ</low_rise><high>ツガレ</high>",
                 pitch_number="0",
@@ -83,6 +94,7 @@ class TestAccDictManager:
         assert result == {
             "欠伸": [
                 FormattedEntry(
+                    raw_headword="欠伸",
                     katakana_reading="アクビ",
                     html_notation="<low_rise>ア</low_rise><high>クビ</high>",
                     pitch_number="0",
@@ -90,11 +102,13 @@ class TestAccDictManager:
             ],
             "悪日": [
                 FormattedEntry(
+                    raw_headword="悪日",
                     katakana_reading="アクビ",
                     html_notation="<high_drop>ア</high_drop><low>クビ</low>",
                     pitch_number="1",
                 ),
                 FormattedEntry(
+                    raw_headword="悪日",
                     katakana_reading="アクビ",
                     html_notation="<low_rise>ア</low_rise><high_drop>ク</high_drop><low>ビ</low>",
                     pitch_number="2",
@@ -102,16 +116,19 @@ class TestAccDictManager:
             ],
             "アクビ": [
                 FormattedEntry(
+                    raw_headword="欠伸",
                     katakana_reading="アクビ",
                     html_notation="<low_rise>ア</low_rise><high>クビ</high>",
                     pitch_number="0",
                 ),
                 FormattedEntry(
+                    raw_headword="悪日",
                     katakana_reading="アクビ",
                     html_notation="<high_drop>ア</high_drop><low>クビ</low>",
                     pitch_number="1",
                 ),
                 FormattedEntry(
+                    raw_headword="悪日",
                     katakana_reading="アクビ",
                     html_notation="<low_rise>ア</low_rise><high_drop>ク</high_drop><low>ビ</low>",
                     pitch_number="2",
@@ -119,6 +136,7 @@ class TestAccDictManager:
             ],
             "欠": [
                 FormattedEntry(
+                    raw_headword="欠",
                     katakana_reading="アクビ",
                     html_notation="<low_rise>ア</low_rise><high>クビ</high>",
                     pitch_number="0",
@@ -135,17 +153,22 @@ class TestAccDictManager:
         result = r.look_up("言葉")
         assert list(result) == [
             FormattedEntry(
+                raw_headword="言葉",
                 katakana_reading="ソウシツ",
                 html_notation="<low_rise>ソ</low_rise><high>ウシツ</high>",
                 pitch_number="0",
             ),
             FormattedEntry(
-                katakana_reading="ソゴ", html_notation="<low_rise>ソ</low_rise><high>ゴ</high>", pitch_number="0"
+                raw_headword="言葉",
+                katakana_reading="ソゴ",
+                html_notation="<low_rise>ソ</low_rise><high>ゴ</high>",
+                pitch_number="0",
             ),
         ]
         result = r.look_up("×××")
         assert list(result) == [
             FormattedEntry(
+                raw_headword="×××",
                 katakana_reading="デタラメ",
                 html_notation="<low_rise>デ</low_rise><high>タラメ</high>",
                 pitch_number="0",

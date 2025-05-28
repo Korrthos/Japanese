@@ -95,6 +95,7 @@ def test_html_notation_to_moras(html_notation: str, expected: list[str]) -> None
     [
         (
             FormattedEntry(
+                "人畜",
                 "ジンチク",
                 "<low_rise>ジ</low_rise><high>ン<devoiced>チ</devoiced>ク</high>",
                 "0",
@@ -106,6 +107,7 @@ def test_html_notation_to_moras(html_notation: str, expected: list[str]) -> None
         ),
         (
             FormattedEntry(
+                "人畜",
                 "ジンチク",
                 "<high_drop>ジ</high_drop><low>ン<devoiced>チ</devoiced>ク</low>",
                 "1",
@@ -117,6 +119,7 @@ def test_html_notation_to_moras(html_notation: str, expected: list[str]) -> None
         ),
         (
             FormattedEntry(
+                "人生哲学",
                 "ジンセイテツガク",
                 "<low_rise>ジ</low_rise><high_drop>ンセイテツ</high_drop><low><nasal>カ<handakuten>&#176;</handakuten></nasal>ク</low>",
                 "6",
@@ -128,6 +131,7 @@ def test_html_notation_to_moras(html_notation: str, expected: list[str]) -> None
         ),
         (
             FormattedEntry(
+                "人生哲学",
                 "ジンセイテツガク",
                 "<low_rise>ジ</low_rise><high_drop>ンセイテ</high_drop><low>ツ<nasal>カ<handakuten>&#176;</handakuten></nasal>ク</low>",
                 "5",
@@ -139,6 +143,7 @@ def test_html_notation_to_moras(html_notation: str, expected: list[str]) -> None
         ),
         (
             FormattedEntry(
+                "妹",
                 "イモウト",
                 "<low_rise>イ</low_rise><high_drop>モート</high_drop>",
                 "4",
@@ -150,6 +155,7 @@ def test_html_notation_to_moras(html_notation: str, expected: list[str]) -> None
         ),
         (
             FormattedEntry(
+                "二十四時間",
                 "ニジュウヨジカン",
                 "<high_drop>ニ</high_drop><low>ジュー</low>・<low_rise>ヨ</low_rise><high_drop>ジ</high_drop><low>カン</low>",
                 "1+2",
@@ -161,6 +167,7 @@ def test_html_notation_to_moras(html_notation: str, expected: list[str]) -> None
         ),
         (
             FormattedEntry(
+                "に",
                 "ニ",
                 "<low_rise>ニ</low_rise>",
                 "0",
@@ -172,6 +179,7 @@ def test_html_notation_to_moras(html_notation: str, expected: list[str]) -> None
         ),
         (
             FormattedEntry(
+                "よ",
                 "ヨ",
                 "<high_drop>ヨ</high_drop>",
                 "1",

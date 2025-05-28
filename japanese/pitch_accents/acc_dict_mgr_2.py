@@ -139,18 +139,30 @@ class SqliteAccDictReader:
 
     def look_up(self, expr: str) -> list[FormattedEntry]:
         return [
-            FormattedEntry(*row)
+            FormattedEntry(
+                raw_headword=row["raw_headword"],
+                katakana_reading=row["katakana_reading"],
+                html_notation=row["html_notation"],
+                pitch_number=row["pitch_number"],
+            )
             for row in self._db.search_pitch_accents(to_katakana(expr), prefer_provider_name=AccDictProvider.user)
         ]
 
     def look_up_grouped(self, expr: str) -> AccentDict:
         headword_to_entries: collections.defaultdict[str, list[FormattedEntry]] = collections.defaultdict(list)
-        for headword, *entry in self._db.search_pitch_accents(
+        for row in self._db.search_pitch_accents(
             to_katakana(expr),
             prefer_provider_name=AccDictProvider.user,
             select_keys=("headword", *Sqlite3Buddy.PITCH_RETRIEVE_KEYS),
         ):
-            headword_to_entries[headword].append(FormattedEntry(*entry))
+            headword_to_entries[row["headword"]].append(
+                FormattedEntry(
+                    raw_headword=row["raw_headword"],
+                    katakana_reading=row["katakana_reading"],
+                    html_notation=row["html_notation"],
+                    pitch_number=row["pitch_number"],
+                )
+            )
         return headword_to_entries
 
     def look_up_and_extend(self, acc_dict: AccentDict, expr: str, expr_reading: str = "") -> None:

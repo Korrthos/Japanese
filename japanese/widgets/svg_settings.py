@@ -11,16 +11,19 @@ from .settings_form import SvgSettingsForm
 
 SHOW_ENTRIES = (
     FormattedEntry(
+        "音楽家",
         "オンガクカ",
         "<low_rise>オ</low_rise><high>ンカ<nasal>&#176;</nasal><devoiced>ク</devoiced>カ</high>",
         "0",
     ),
     FormattedEntry(
+        "数か月",
         "スウカゲツ",
         "<low_rise>ス</low_rise><high_drop>ウカ</high_drop><low>ゲツ</low>",
         "3",
     ),
     FormattedEntry(
+        "淑女",
         "シュクジョ",
         "<high_drop><devoiced>シ</devoiced>ュ</high_drop><low>クジョ</low>",
         "1",

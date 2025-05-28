@@ -20,7 +20,8 @@ RE_PITCH_TAG = re.compile(r"(<[^<>]+>)")
 class AccDictRawTSVEntry(typing.TypedDict):
     """Entry as it appears in the pitch accents file."""
 
-    headword: str
+    headword: str  # all kana characters are converted to katakana
+    raw_headword: str  # unaltered headword
     katakana_reading: str
     html_notation: str
     pitch_number: str  # can't be converted to int. might contain separators and special symbols.
@@ -33,6 +34,7 @@ class AccDictProvider:
 
 
 class FormattedEntry(NamedTuple):
+    raw_headword: str
     katakana_reading: str
     html_notation: str
     pitch_number: str
