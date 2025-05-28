@@ -105,7 +105,7 @@ class ViewPitchAccentsDialog(AnkiSaveAndRestoreGeomDialog):
                     max_results=99,
                 )
             )
-        tooltip("couldn't get clipboard.", parent=self)
+        return tooltip("couldn't get clipboard.", parent=self)
 
     def _format_html_result(self) -> str:
         """Create HTML body"""
