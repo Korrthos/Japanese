@@ -30,7 +30,7 @@ ON pitch_accents_formatted(katakana_reading);
 CREATE INDEX IF NOT EXISTS index_pitch_accents_source
 ON pitch_accents_formatted(source);
 """
-PITCH_TABLES_SCHEMA_VERSION: typing.Final[int] = 1
+PITCH_TABLES_SCHEMA_VERSION: typing.Final[int] = 2
 PITCH_TABLES_SCHEMA_NAME: typing.Final[str] = "pitch"
 
 
@@ -47,8 +47,33 @@ class PitchSqlite3Buddy(Sqlite3BuddyABC, abc.ABC):
         if not is_new_file:
             # The database file was created before.
             # Migrate the database if necessary.
-            pass
+            self._migrate_pitch_db()
         self.set_db_version(PITCH_TABLES_SCHEMA_NAME, PITCH_TABLES_SCHEMA_VERSION)
+
+    def _migrate_pitch_db(self) -> None:
+        """
+        Check db version. Perform migrations if the version is old.
+        """
+        version = self.get_db_version(PITCH_TABLES_SCHEMA_NAME)
+        if version == PITCH_TABLES_SCHEMA_VERSION:
+            return
+        if version is None:
+            # version hasn't been set before = upgraded from an older version of the add-on.
+            version = 1
+        if version == 1:
+            query = """
+            DELETE FROM pitch_accents_formatted;
+            ALTER TABLE pitch_accents_formatted
+            ADD COLUMN raw_headword TEXT NOT NULL;
+            """
+            self.con.executescript(query)
+            version += 1
+            print(f"Migrated pitch accent table to version {version}")
+        if version != PITCH_TABLES_SCHEMA_VERSION:
+            raise Sqlite3BuddyVersionError(
+                f"After migration, version should be {PITCH_TABLES_SCHEMA_VERSION}, but got {version}"
+            )
+        self.con.commit()
 
     def get_pitch_accents_headword_count(self) -> int:
         query = """
