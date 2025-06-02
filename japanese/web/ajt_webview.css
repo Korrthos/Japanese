@@ -37,8 +37,7 @@ a {
     background-color: rgba(87, 43, 43, 0.1);
 }
 
-.keyword,
-.pitch_accents li {
+.ajt__pitch_lookup li {
     padding: 0.4rem 0.2rem;
 }
 
@@ -46,16 +45,20 @@ a {
     background-color: rgba(144, 148, 113, 0.1);
 }
 
-.pitch_accents li {
-    list-style: none;
+.ajt__pitch_lookup :where(ol, ul, li) {
+    list-style-type: none;
+}
+
+.pitch_accents,
+.ajt__pitch_lookup li {
     display: flex;
     flex-flow: row nowrap;
     align-items: flex-start;
     column-gap: 0.4rem;
 }
 
-.pitch_accents li:nth-of-type(2n) {
-    background-color: rgba(165, 134, 126, 0.1);
+.ajt__pitch_lookup li:nth-of-type(2n) {
+    background-color: rgba(165, 134, 126, 0.2);
 }
 
 .pitch_number {
@@ -70,7 +73,7 @@ a {
     color: #fffaf0;
     font-weight: bold;
     padding: 1px 3px;
-    margin: 0;
+    margin: 4px 2px;
     cursor: pointer;
     border-radius: 3px;
     font-size: 12px;
