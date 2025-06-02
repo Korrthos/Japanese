@@ -1,6 +1,6 @@
 # Copyright: Ajatt-Tools and contributors; https://github.com/Ajatt-Tools
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
-
+import collections
 import io
 from collections.abc import Sequence
 from gettext import gettext as _
@@ -20,7 +20,6 @@ from .database.sqlite3_buddy import Sqlite3Buddy
 from .helpers.consts import ADDON_NAME
 from .helpers.tokens import clean_furigana
 from .helpers.webview_utils import anki_addon_web_relpath
-from .mecab_controller import to_hiragana
 from .pitch_accents.common import AccentDict, FormattedEntry, OrderedSet
 from .pitch_accents.styles import HTMLPitchPatternStyle
 from .reading import format_pronunciations, lookup, svg_graph_maker, update_html
@@ -47,8 +46,12 @@ def get_notation(entry: FormattedEntry, mode: LookupDialogPitchOutputFormat) -> 
     raise RuntimeError("Unreachable.")
 
 
+def entry_to_html(entry: FormattedEntry) -> str:
+    return get_notation(entry, mode=cfg.pitch_accent.lookup_pitch_format)
+
+
 def entries_to_html(entries: Sequence[FormattedEntry]) -> OrderedSet[str]:
-    return OrderedSet(get_notation(entry, mode=cfg.pitch_accent.lookup_pitch_format) for entry in entries)
+    return OrderedSet(entry_to_html(entry) for entry in entries)
 
 
 def lookup_pronunciations(search: str) -> AccentDict:
@@ -111,13 +114,21 @@ class ViewPitchAccentsDialog(AnkiSaveAndRestoreGeomDialog):
         """Create HTML body"""
         html = io.StringIO()
         html.write('<main class="ajt__pitch_lookup">')
+
+        html_entry_to_headwords = collections.defaultdict(set)
         for word, entries in self._pronunciations.items():
-            html.write(f'<div class="keyword">{to_hiragana(word)}</div>')
+            for pitch_pattern in entries:
+                html_entry_to_headwords[entry_to_html(pitch_pattern)].add(pitch_pattern.raw_headword)
+
+        for pitch_pattern, headwords in html_entry_to_headwords.items():
+            # Keyword (headword)
+            html.write(f'<div class="keyword"><ul>')
+            for headword in headwords:
+                html.write(f"<li>{headword}</li>")
+            html.write(f"</ul></div>")
+            # Pitches (entries)
             html.write('<div class="pitch_accents">')
-            html.write("<ul>")
-            for entry in entries_to_html(entries):
-                html.write(f"<li>{entry}</li>")
-            html.write("</ul>")
+            html.write(pitch_pattern)
             html.write(f"</div>")
         html.write("</main>")
         return html.getvalue()
