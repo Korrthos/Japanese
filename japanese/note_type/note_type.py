@@ -34,6 +34,9 @@ def save_to_col(file: BundledCSSFile) -> None:
 
 
 def is_debug_enabled() -> bool:
+    """
+    https://addon-docs.ankiweb.net/debugging.html?highlight=QTWEBENGINE_REMOTE_DEBUGGING#webviews
+    """
     return "QTWEBENGINE_REMOTE_DEBUGGING" in os.environ
 
 
