@@ -35,7 +35,7 @@ def get_headers() -> dict[str, str]:
         "Sec-Fetch-Site": "cross-site",
         "Sec-Fetch-User": "?1",
         "TE": "trailers",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0",
     }
 
 
