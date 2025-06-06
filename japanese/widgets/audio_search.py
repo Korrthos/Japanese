@@ -316,11 +316,11 @@ class AnkiAudioSearchDialog(AudioSearchDialog, AnkiSaveAndRestoreGeomDialog):
                 on_finish=self._handle_and_play_download_result,
             )
 
-    def _handle_and_play_download_result(self, results: FileSaveResults):
+    def _handle_and_play_download_result(self, results: FileSaveResults) -> None:
         self._search_result_label.hide_count()
         sound.av_player.play_tags([SoundOrVideoTag(filename=result.desired_filename) for result in results.successes])
         if results.fails and (txt := format_report_errors_msg(results.fails)):
-            return tooltip(msg=txt, parent=self, period=7000, y_offset=calc_tooltip_offset(len(results.fails)))
+            tooltip(msg=txt, parent=self, period=7000, y_offset=calc_tooltip_offset(len(results.fails)))
 
     def _open_audio_file(self, file: FileUrlData) -> None:
         tooltip(tr.qt_misc_loading(), period=1000)
@@ -329,9 +329,8 @@ class AnkiAudioSearchDialog(AudioSearchDialog, AnkiSaveAndRestoreGeomDialog):
             return open_file(file.url)
         elif mw.col.media.have(file.desired_filename):
             return open_file(os.path.join(mw.col.media.dir(), file.desired_filename))
-        else:
-            with no_bundled_libs():
-                QDesktopServices.openUrl(QUrl(file.url))
+        with no_bundled_libs():
+            return QDesktopServices.openUrl(QUrl(file.url))
 
     def _search_forvo(self, search_text: str) -> None:
         """
