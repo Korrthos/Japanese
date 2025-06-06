@@ -2,7 +2,7 @@
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 import collections
 import io
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 from gettext import gettext as _
 from typing import final
 
@@ -110,17 +110,19 @@ class ViewPitchAccentsDialog(AnkiSaveAndRestoreGeomDialog):
             )
         return tooltip("couldn't get clipboard.", parent=self)
 
+    def _map_html_entry_to_headwords(self) -> dict[str, Collection[str]]:
+        html_entry_to_headwords: dict[str, set[str]] = collections.defaultdict(set)
+        for word, entries in self._pronunciations.items():
+            for pitch_pattern in entries:
+                html_entry_to_headwords[entry_to_html(pitch_pattern)].add(pitch_pattern.raw_headword)
+        return html_entry_to_headwords
+
     def _format_html_result(self) -> str:
         """Create HTML body"""
         html = io.StringIO()
         html.write('<main class="ajt__pitch_lookup">')
 
-        html_entry_to_headwords = collections.defaultdict(set)
-        for word, entries in self._pronunciations.items():
-            for pitch_pattern in entries:
-                html_entry_to_headwords[entry_to_html(pitch_pattern)].add(pitch_pattern.raw_headword)
-
-        for pitch_pattern, headwords in html_entry_to_headwords.items():
+        for pitch_pattern, headwords in self._map_html_entry_to_headwords().items():
             # Keyword (headword)
             html.write(f'<div class="keyword"><ul>')
             for headword in headwords:
