@@ -7,10 +7,16 @@ import pytest
 from japanese.database.sqlite3_buddy import Sqlite3Buddy
 from japanese.pitch_accents.acc_dict_mgr_2 import (
     SqliteAccDictReader,
-    SqliteAccDictWriter,
+    SqliteAccDictWriter, iter_bundled_pitch_accent_files,
 )
 from japanese.pitch_accents.common import FormattedEntry
+from japanese.pitch_accents.consts import FORMATTED_ACCENTS_TSV
 from tests.conftest import tmp_db_connection, tmp_upd_file, tmp_user_accents_file
+
+
+def test_iter_bundled_pitch_accent_files() -> None:
+    names = [path.name for path in iter_bundled_pitch_accent_files(FORMATTED_ACCENTS_TSV)]
+    assert names == ["pitch_accents_formatted.1.csv", "pitch_accents_formatted.2.csv", "pitch_accents_formatted.3.csv"]
 
 
 class TestAccDictManager:

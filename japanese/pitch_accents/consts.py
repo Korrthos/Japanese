@@ -19,4 +19,7 @@ FORMATTED_ACCENTS_UPDATED: Final[pathlib.Path] = pathlib.Path(user_files_dir()) 
 
 # Ensure everything is ok
 assert RES_DIR_PATH.is_dir(), "res folder must exist."
-assert FORMATTED_ACCENTS_TSV.is_file(), "formatted pitch accents must be present."
+# Currently, there are three parts.
+assert FORMATTED_ACCENTS_TSV.with_suffix(f".1.csv").is_file(), "formatted pitch accents must be present."
+assert FORMATTED_ACCENTS_TSV.with_suffix(f".2.csv").is_file(), "formatted pitch accents must be present."
+assert FORMATTED_ACCENTS_TSV.with_suffix(f".3.csv").is_file(), "formatted pitch accents must be present."

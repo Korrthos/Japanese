@@ -1,6 +1,7 @@
 # Copyright: Ajatt-Tools and contributors; https://github.com/Ajatt-Tools
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 import collections
+import itertools
 import os
 import pathlib
 import typing
@@ -50,7 +51,12 @@ class SqliteAccDictWriter:
         return self._upd_file.is_file() and self.is_upd_file_newer()
 
     def is_upd_file_newer(self) -> bool:
-        return os.path.getmtime(self._upd_file) > os.path.getmtime(self._bundled_tsv_file)
+        newest = max(
+            os.path.getmtime(bundled_tsv_file)
+            for bundled_tsv_file
+            in iter_bundled_pitch_accent_files(self._bundled_tsv_file)
+        )
+        return os.path.getmtime(self._upd_file) > newest
 
     def is_table_filled(self) -> bool:
         return self._db.get_pitch_accents_headword_count() > 0
@@ -100,6 +106,14 @@ class SqliteAccDictWriter:
         self.mark_table_updated()
 
 
+def iter_bundled_pitch_accent_files(tsv_file_path_pattern: pathlib.Path) -> typing.Iterable[pathlib.Path]:
+    for part_n in itertools.count(start=1):
+        file_path = tsv_file_path_pattern.with_suffix(f".{part_n}.csv")
+        if not file_path.is_file():
+            break
+        yield file_path
+
+
 def iter_formatted_rows(tsv_file_path: pathlib.Path) -> typing.Iterable[AccDictRawTSVEntry]:
     """
     Read the formatted pitch accents file to memory.
@@ -108,8 +122,15 @@ def iter_formatted_rows(tsv_file_path: pathlib.Path) -> typing.Iterable[AccDictR
     新年会 シンネンカイ <low_rise>シ</low_rise><high_drop>ンネ</high_drop><low>ンカイ</low> 3
     """
     row: AccDictRawTSVEntry
-    with open(tsv_file_path, newline="", encoding="utf-8") as f:
-        yield from get_tsv_reader(f)
+
+    for file_path in iter_bundled_pitch_accent_files(tsv_file_path):
+        try:
+            with open(file_path, encoding="utf-8", newline="") as f:
+                print(f"reading pitch accents tsv file: {file_path}")
+                # field names should be printed to the file itself
+                yield from get_tsv_reader(f)
+        except FileNotFoundError:
+            break
 
 
 def filter_entries(entries: typing.Sequence[FormattedEntry], kana_reading: str) -> typing.Iterable[FormattedEntry]:
