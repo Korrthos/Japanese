@@ -5,3 +5,6 @@
 	path = japanese/mecab_controller
 	url = git@github.com:Ajatt-Tools/mecab_controller.git
 	url = https://github.com/Ajatt-Tools/mecab_controller.git
+[submodule "kanjigrid"]
+	path = kanjigrid
+	url = git@github.com:Kuuuube/kanjigrid.git
