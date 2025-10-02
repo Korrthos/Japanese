@@ -15,6 +15,7 @@ def start_addon() -> None:
         lookup_dialog,
         tasks,
         welcome_dialog,
+        kanjigrid_addon,
     )
     from .helpers.webview_utils import anki_addon_set_web_exports
     from .note_type import note_type
@@ -30,6 +31,7 @@ def start_addon() -> None:
     editor_toolbar.init()
     welcome_dialog.init()
     note_type.init()
+    kanjigrid_addon.init()
 
 
 if mw and "pytest" not in sys.modules:

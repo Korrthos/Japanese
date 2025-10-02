@@ -3,15 +3,12 @@
 
 import enum
 import functools
-import json
 import re
 from collections.abc import Iterable, MutableSequence, Sequence
 from typing import NamedTuple, final
 
-from aqt import mw, AnkiQt
+from aqt import mw
 
-from .helpers.file_ops import find_file_in_parents
-from .kanjigrid.config_util import KanjiGridConfigProxy
 from .ajt_common.addon_config import AddonConfigManager, ConfigSubViewBase
 from .audio_manager.abstract import AudioSettingsConfigViewABC
 from .audio_manager.basic_types import AudioSourceConfig, AudioSourceConfigDict
