@@ -12,9 +12,10 @@ from aqt.qt import *
 from aqt.utils import tooltip
 from aqt.webview import AnkiWebView
 
+from .kanjigrid import kanjigrid
 from .ajt_common.about_menu import menu_root_entry, tweak_window
 from .ajt_common.restore_geom_dialog import AnkiSaveAndRestoreGeomDialog
-from .config_view import LookupDialogPitchOutputFormat
+from .config_view import LookupDialogPitchOutputFormat, AJTKanjiGridConfigProxy
 from .config_view import config_view as cfg
 from .database.sqlite3_buddy import Sqlite3Buddy
 from .helpers.consts import ADDON_NAME
@@ -199,3 +200,5 @@ def init() -> None:
     gui_hooks.webview_will_show_context_menu.append(add_context_menu_item)
     # Hook to the browser in order to have the keyboard shortcut work there as well.
     gui_hooks.browser_menus_did_init.append(setup_browser_menu)
+
+    mw.kanjigrid = kanjigrid.KanjiGrid(AJTKanjiGridConfigProxy(mw, cfg))

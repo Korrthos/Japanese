@@ -3,12 +3,15 @@
 
 import enum
 import functools
+import json
 import re
 from collections.abc import Iterable, MutableSequence, Sequence
 from typing import NamedTuple, final
 
-from aqt import mw
+from aqt import mw, AnkiQt
 
+from .helpers.file_ops import find_file_in_parents
+from .kanjigrid.config_util import KanjiGridConfigProxy
 from .ajt_common.addon_config import AddonConfigManager, ConfigSubViewBase
 from .audio_manager.abstract import AudioSettingsConfigViewABC
 from .audio_manager.basic_types import AudioSourceConfig, AudioSourceConfigDict
@@ -418,6 +421,25 @@ class PitchColorCodesConfigView(ConfigSubViewBase):
     @property
     def unknown(self) -> str:
         return self[PitchType.unknown]
+
+
+class AJTKanjiGridConfigProxy(KanjiGridConfigProxy):
+    def __init__(self, mwref: AnkiQt, mgr: AddonConfigManager):
+        super().__init__(mwref)
+        self.mgr = mgr
+
+    def _get_config_dict(self) -> dict:
+        kanjigrid_default_config_path = find_file_in_parents("kanjigrid/config.json")
+        with open(kanjigrid_default_config_path, encoding="utf8") as f:
+            default_dict = json.load(f)
+        for key, value in default_dict.items():
+            if key not in self.mgr["kanjigrid"]:
+                self.mgr["kanjigrid"][key] = value
+        return self.mgr["kanjigrid"]
+
+    def _write_config_dict(self, config: dict) -> None:
+        self.mgr["kanjigrid"].update(config)
+        self.mgr.write_config()
 
 
 class JapaneseConfig(AddonConfigManager):
