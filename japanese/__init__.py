@@ -12,10 +12,10 @@ def start_addon() -> None:
         context_menu,
         editor_toolbar,
         gui,
+        kanjigrid_addon,
         lookup_dialog,
         tasks,
         welcome_dialog,
-        kanjigrid_addon,
     )
     from .helpers.webview_utils import anki_addon_set_web_exports
     from .note_type import note_type

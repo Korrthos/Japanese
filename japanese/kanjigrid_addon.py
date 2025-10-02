@@ -2,16 +2,15 @@
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 import json
 
-from aqt import mw, AnkiQt
+from aqt import AnkiQt, mw
 from aqt.qt import *
 
+from .ajt_common.about_menu import menu_root_entry
 from .ajt_common.addon_config import AddonConfigManager
+from .config_view import config_view as cfg
 from .helpers.file_ops import find_file_in_parents
 from .kanjigrid import KanjiGridConfigProxy
-
 from .kanjigrid.kanjigrid import KanjiGrid
-from .ajt_common.about_menu import menu_root_entry
-from .config_view import config_view as cfg
 
 
 class AJTKanjiGridConfigProxy(KanjiGridConfigProxy):
