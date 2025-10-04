@@ -126,6 +126,8 @@ def on_model_updated(notetype: AnkiNoteTypeDict, skip_checks: bool = False) -> N
     # Now AJT Japanese needs to add the code back to avoid breakage.
     # Reference: https://github.com/Ajatt-Tools/gomi
     assert isinstance(notetype, dict), "note type should be a dictionary."
+    if not is_relevant_model(notetype):
+        return
     ensure_imports_in_model_dict(notetype)
 
 
