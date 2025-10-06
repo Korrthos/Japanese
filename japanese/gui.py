@@ -271,10 +271,10 @@ class FuriganaProfileEditForm(ProfileEditForm, profile_class=ProfileFurigana):
         )
         self._form.insert_addon_scripts.setToolTip(
             "The add-on inserts additional JavaScript and CSS code into the card templates\n"
-            "to enable correct display of furigana for words with many readings,\n"
-            "and the display of pitch accent information on mouse hover.\n"
-            'It is recommended to always enable this setting if "color code pitch" is enabled\n'
-            'and if the "maximum results" parameter is larger than 1.'
+            "to enable correct display of furigana for words with multiple readings,\n"
+            "and to show pitch accent information on mouse hover.\n\n"
+            'It is recommended to always enable this setting if "Color code pitch" is enabled for the profile\n'
+            'and if the "Maximum results" parameter is greater than 1.'
         )
 
 
