@@ -60,7 +60,11 @@ def is_relevant_model(model_dict: Optional[AnkiNoteTypeDict]) -> bool:
     assert model_dict, "model dict must not be None"
     all_field_names = field_names_from_model_dict(model_dict)
     return any(
-        note_type_matches(model_dict, profile) and profile.source in all_field_names
+        (
+            profile.insert_addon_scripts  # fmt: skip
+            and profile.source in all_field_names
+            and note_type_matches(model_dict, profile)
+        )
         for profile in cfg.iter_profiles()
         if isinstance(profile, ProfileFurigana)
     )

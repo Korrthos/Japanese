@@ -257,15 +257,24 @@ class FuriganaProfileEditForm(ProfileEditForm, profile_class=ProfileFurigana):
     def _expand_form(self) -> None:
         super()._expand_form()
         self._form.color_code_pitch = FlagSelectCombo(enum_type=ColorCodePitchFormat)
+        self._form.insert_addon_scripts = QCheckBox()
 
     def load_profile(self, profile: ProfileFurigana) -> None:
         super().load_profile(profile)
         self._form.color_code_pitch.set_checked_flags(profile.color_code_pitch)
+        self._form.insert_addon_scripts.setChecked(profile.insert_addon_scripts)
 
     def _add_tooltips(self) -> None:
         super()._add_tooltips()
         self._form.color_code_pitch.setToolTip(
             "One or more variants to color-code pitch accents in words or sentences."
+        )
+        self._form.insert_addon_scripts.setToolTip(
+            "The add-on inserts additional JavaScript and CSS code into the card templates\n"
+            "to enable correct display of furigana for words with many readings,\n"
+            "and the display of pitch accent information on mouse hover.\n"
+            'It is recommended to always enable this setting if "color code pitch" is enabled\n'
+            'and if the "maximum results" parameter is larger than 1.'
         )
 
 
