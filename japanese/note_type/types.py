@@ -12,5 +12,11 @@ class ChangeImportsAction(enum.Enum):
 
 
 class RelevantModelSearchResult(typing.NamedTuple):
+    """
+    A Relevant model is a model AJT Japanese will add its CSS and JS imports.
+    The add-on inserts additional JavaScript and CSS code into the card templates
+    to enable the display of pitch accent information on mouse hover.
+    """
+
     is_relevant: bool
     nameid: NotetypeNameId
