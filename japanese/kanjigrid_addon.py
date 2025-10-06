@@ -34,6 +34,6 @@ class AJTKanjiGridConfigProxy(KanjiGridConfigProxy):
 
 def init() -> None:
     root_menu = menu_root_entry()
-    gen_grid_action = QAction("Generate Kanji Grid...", root_menu)
+    gen_grid_action = QAction("Analyze known kanji...", root_menu)
     root_menu.addAction(gen_grid_action)
     mw.kanjigrid = KanjiGrid(cfg=AJTKanjiGridConfigProxy(mw, cfg), menu_action=gen_grid_action)
