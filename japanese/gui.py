@@ -274,7 +274,7 @@ class FuriganaProfileEditForm(ProfileEditForm, profile_class=ProfileFurigana):
             "to enable correct display of furigana for words with multiple readings,\n"
             "and to show pitch accent information on mouse hover.\n\n"
             'It is recommended to always enable this setting if "Color code pitch" is enabled for the profile\n'
-            'and if the "Maximum results" parameter is greater than 1.'
+            'and/or if the "Maximum results" parameter is greater than 1.'
         )
 
 
