@@ -9,7 +9,7 @@ from .ajt_common.about_menu import menu_root_entry
 from .ajt_common.addon_config import AddonConfigManager
 from .config_view import config_view as cfg
 from .helpers.file_ops import find_file_in_parents
-from .kanjigrid import KanjiGridConfigProxy
+from .kanjigrid.config_util import KanjiGridConfigProxy
 from .kanjigrid.kanjigrid import KanjiGrid
 
 
