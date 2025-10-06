@@ -7,7 +7,8 @@ import pytest
 from japanese.database.sqlite3_buddy import Sqlite3Buddy
 from japanese.pitch_accents.acc_dict_mgr_2 import (
     SqliteAccDictReader,
-    SqliteAccDictWriter, iter_bundled_pitch_accent_files,
+    SqliteAccDictWriter,
+    iter_bundled_pitch_accent_files,
 )
 from japanese.pitch_accents.common import FormattedEntry
 from japanese.pitch_accents.consts import FORMATTED_ACCENTS_TSV

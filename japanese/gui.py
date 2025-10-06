@@ -556,6 +556,25 @@ class AudioSourcesEditTable(QWidget):
         self._apply_button.setToolTip("Apply current sources configuration.")
 
 
+class PitchStatsLabel(QLabel):
+    def __init__(self) -> None:
+        super().__init__()
+        self._populate()
+
+    def _populate(self) -> None:
+        assert mw
+        QueryOp(
+            parent=mw,
+            op=lambda collection: acc_dict.get_headword_count_op(),
+            success=lambda headword_count: self._update_label_text(headword_count),
+        ).without_collection().run_in_background()
+
+    def _update_label_text(self, headword_count: int) -> None:
+        if is_obj_deleted(self):
+            return
+        self.setText(f"AJT Japanese knows pitch accents of {headword_count} words.")
+
+
 @final
 class SettingsDialog(AnkiSaveAndRestoreGeomDialog, MgrPropMixIn):
     name: str = "ajt__japanese_options"
@@ -571,6 +590,7 @@ class SettingsDialog(AnkiSaveAndRestoreGeomDialog, MgrPropMixIn):
         self._pitch_profiles_edit = PitchProfilesEdit()
         self._pitch_settings = GroupBoxWrapper(PitchSettingsForm(cfg.pitch_accent))
         self._svg_settings = SvgSettingsWidget(cfg.svg_graphs)
+        self._pitch_stats_label = PitchStatsLabel()
 
         # Audio tab
         self._audio_profiles_edit = AudioProfilesEdit()
@@ -615,6 +635,7 @@ class SettingsDialog(AnkiSaveAndRestoreGeomDialog, MgrPropMixIn):
         tab.setLayout(layout := QVBoxLayout())
         layout.addWidget(self._pitch_profiles_edit)
         layout.addWidget(self._pitch_settings)
+        layout.addWidget(self._pitch_stats_label)
         self._tabs.addTab(tab, "Pitch accent")
 
         # SVG settings

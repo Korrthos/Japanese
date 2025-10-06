@@ -53,13 +53,15 @@ class SqliteAccDictWriter:
     def is_upd_file_newer(self) -> bool:
         newest = max(
             os.path.getmtime(bundled_tsv_file)
-            for bundled_tsv_file
-            in iter_bundled_pitch_accent_files(self._bundled_tsv_file)
+            for bundled_tsv_file in iter_bundled_pitch_accent_files(self._bundled_tsv_file)
         )
         return os.path.getmtime(self._upd_file) > newest
 
+    def get_headword_count(self) -> int:
+        return self._db.get_pitch_accents_headword_count()
+
     def is_table_filled(self) -> bool:
-        return self._db.get_pitch_accents_headword_count() > 0
+        return self.get_headword_count() > 0
 
     def write_rows(self, rows: typing.Iterable[AccDictRawTSVEntry]) -> None:
         return self._db.insert_pitch_accent_data(rows, AccDictProvider.bundled)
@@ -158,6 +160,9 @@ class SqliteAccDictReader:
         self._db = db
         self._group_by_headword = group_by_headword
 
+    def get_headword_count(self) -> int:
+        return self._db.get_pitch_accents_headword_count()
+
     def look_up(self, expr: str) -> list[FormattedEntry]:
         return [
             FormattedEntry(
@@ -239,10 +244,11 @@ class AccentDictManager2:
             writer = self.mk_writer(db)
             return writer.is_db_ready()
 
-    def _ensure_sqlite_populated_op(self) -> None:
+    def _ensure_sqlite_populated_op(self) -> int:
         with Sqlite3Buddy(self._db_path) as db:
             writer = self.mk_writer(db)
             writer.ensure_sqlite_populated()
+            return writer.get_headword_count()
 
     def ensure_dict_ready(self) -> None:
         """
@@ -253,10 +259,15 @@ class AccentDictManager2:
         QueryOp(
             parent=mw,
             op=lambda collection: self._ensure_sqlite_populated_op(),
-            success=lambda _: None,
+            success=lambda headword_count: print(f"AJT Japanese knows pitch accents of {headword_count} words."),
         ).without_collection().with_progress(
             "Reloading pitch accent dictionary...",
         ).run_in_background()
+
+    def get_headword_count_op(self) -> int:
+        with Sqlite3Buddy(self._db_path) as db:
+            reader = SqliteAccDictReader(db)
+            return reader.get_headword_count()
 
     def ensure_dict_ready_on_main(self) -> None:
         """
