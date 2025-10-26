@@ -102,6 +102,7 @@ class ColorCodeWrapper(io.StringIO):
         if ColorCodePitchFormat.color in self._output_format:
             self.write(f"color: {html_color};")
         if ColorCodePitchFormat.color | ColorCodePitchFormat.underline in self._output_format:
+            # if color and underline are both enabled, add a space between the attributes.
             self.write(" ")
         if ColorCodePitchFormat.underline in self._output_format:
             self.write(
