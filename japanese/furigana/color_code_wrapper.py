@@ -5,7 +5,7 @@ from typing import Optional
 
 from ..config_view import JapaneseConfig
 from ..helpers.profiles import ColorCodePitchFormat
-from ..pitch_accents.basic_types import AccDbParsedToken, PitchColor, PitchType
+from ..pitch_accents.basic_types import AccDbParsedToken, PitchType
 from .attach_rules import SKIP_COLORING
 
 
