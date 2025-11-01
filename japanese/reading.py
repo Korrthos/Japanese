@@ -15,7 +15,6 @@ from .mecab_controller.mecab_controller import MecabController
 from .pitch_accents.acc_dict_mgr_2 import AccentDictManager2
 from .pitch_accents.accent_lookup import AccentLookup
 from .pitch_accents.basic_types import (
-    PitchColor,
     count_moras,
     pitch_type_from_pitch_num,
 )
@@ -40,11 +39,7 @@ def convert_to_inline_style(txt: str, pitch_color: str, pitch_accent_style: HTML
 
 
 def pitch_color_from_entry(entry: FormattedEntry) -> str:
-    pitch_type = pitch_type_from_pitch_num(entry.pitch_number, count_moras(entry.katakana_reading))
-    try:
-        return PitchColor[pitch_type.name].value
-    except KeyError:
-        return PitchColor.unknown.value
+    return cfg.pitch_color_codes.lookup_color(pitch_type_from_pitch_num(entry.pitch_number, count_moras(entry.katakana_reading)))
 
 
 def update_html(entry: FormattedEntry, pitch_accent_style: HTMLPitchPatternStyle) -> str:

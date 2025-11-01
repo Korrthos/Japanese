@@ -18,27 +18,6 @@ def should_skip_coloring(token: AccDbParsedToken) -> bool:
     return token.part_of_speech in SKIP_COLORING or not token.has_pitch()
 
 
-def get_main_pitch_color(token: AccDbParsedToken) -> Optional[str]:
-    """
-    Determine pitch color based on available accents.
-    If the word has many different accents (e.g. heiban and atamadaka),
-    don't output anything because that might mislead the user.
-    """
-    main_pitch_type: Optional[PitchType] = None
-    for entry in token.headword_accents:
-        for accent in entry.pitches:
-            if not main_pitch_type:
-                main_pitch_type = accent.type
-            elif main_pitch_type != accent.type:
-                return PitchColor.unknown.value
-    if not main_pitch_type:
-        return None
-    try:
-        return PitchColor[main_pitch_type.name].value
-    except KeyError:
-        return PitchColor.unknown.value
-
-
 class ColorCodeWrapper(io.StringIO):
     _token: AccDbParsedToken
     _output_format: ColorCodePitchFormat
@@ -76,13 +55,33 @@ class ColorCodeWrapper(io.StringIO):
             self._end_wrap()
         return super().getvalue()
 
+    def _get_main_pitch_color(self, token: AccDbParsedToken) -> Optional[str]:
+        """
+        Determine pitch color based on available accents.
+        If the word has many different accents (e.g. heiban and atamadaka),
+        don't output anything because that might mislead the user.
+        """
+        main_pitch_type: Optional[PitchType] = None
+        for entry in token.headword_accents:
+            for accent in entry.pitches:
+                if not main_pitch_type:
+                    main_pitch_type = accent.type
+                elif main_pitch_type != accent.type:
+                    return self._cfg.pitch_color_codes.unknown
+        if not main_pitch_type:
+            return None
+        try:
+            return self._cfg.pitch_color_codes.lookup_color(main_pitch_type)
+        except KeyError:
+            return self._cfg.pitch_color_codes.unknown
+
     def _start_wrap(self) -> None:
         assert self._output_format != ColorCodePitchFormat(0)
         self.write(f'<span class="ajt__word_info"')
         if ColorCodePitchFormat.attributes in self._output_format:
             self.write(f' part_of_speech="{self._token.part_of_speech.name}"')
             self.write(f' pitch="{self._token.describe_pitches(self._cfg.furigana.maximum_pitch_accents)}"')
-        if html_color := get_main_pitch_color(self._token):
+        if html_color := self._get_main_pitch_color(self._token):
             self._write_inline_color(html_color)
         self.write(">")
 

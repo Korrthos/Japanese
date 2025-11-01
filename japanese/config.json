@@ -71,6 +71,14 @@
     "maximum_results": 3,
     "maximum_pitch_accents": 3
   },
+  "pitch_color_codes": {
+    "heiban": "#3366CC",
+    "atamadaka ": "red",
+    "nakadaka": "#eb8500",
+    "odaka ": "green",
+    "kifuku": "purple",
+    "unknown": "#5f5f5f"
+  },
   "context_menu": {
     "generate_furigana": true,
     "to_katakana": true,
