@@ -66,7 +66,7 @@ class FuriganaGen:
             elif acc_db_result := tuple(self.try_lookup_full_text(token)):
                 # If full text search succeeded, continue.
                 substrings.extend(acc_db_result)
-            elif split_morphemes is True:
+            elif split_morphemes:
                 # Split with mecab, format furigana for each word.
                 substrings.extend(self.append_accents(out) for out in self._mecab.translate(token))
             elif out := self.mecab_single_word(token):
@@ -84,7 +84,7 @@ class FuriganaGen:
             )
         ).strip()
 
-    def mecab_single_word(self, token: Token) -> Optional[MecabParsedToken]:
+    def mecab_single_word(self, token: str) -> Optional[MecabParsedToken]:
         if (out := self._mecab.translate(token)) and out[0].word == token:
             return out[0]
         return None
@@ -177,7 +177,7 @@ class FuriganaGen:
 
         return self.format_furigana_readings(out.word, readings)
 
-    def try_lookup_full_text(self, text: str) -> Iterable[AccDbParsedToken]:
+    def try_lookup_full_text(self, text: Token) -> Iterable[AccDbParsedToken]:
         """
         Try looking up whole text in the accent db.
         Avoids calling mecab when the text contains one word in dictionary form
