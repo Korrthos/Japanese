@@ -56,6 +56,7 @@ from .widgets.settings_form import (
     ContextMenuSettingsForm,
     ForvoSettingsForm,
     FuriganaSettingsForm,
+    PitchColorCodesSettingsForm,
     PitchSettingsForm,
     SettingsForm,
 )
@@ -585,6 +586,7 @@ class SettingsDialog(AnkiSaveAndRestoreGeomDialog, MgrPropMixIn):
         # Furigana tab
         self._furigana_profiles_edit = FuriganaProfilesEdit()
         self._furigana_settings = GroupBoxWrapper(FuriganaSettingsForm(cfg.furigana))
+        self._color_codes_settings = GroupBoxWrapper(PitchColorCodesSettingsForm(cfg.pitch_color_codes))
 
         # Pitch tab
         self._pitch_profiles_edit = PitchProfilesEdit()
@@ -625,9 +627,14 @@ class SettingsDialog(AnkiSaveAndRestoreGeomDialog, MgrPropMixIn):
     def _setup_tabs(self) -> None:
         # Furigana
         tab = QWidget()
-        tab.setLayout(layout := QVBoxLayout())
-        layout.addWidget(self._furigana_profiles_edit)
-        layout.addWidget(self._furigana_settings)
+        tab.setLayout(layout := QGridLayout())
+        # int fromRow, int fromColumn, int rowSpan, int columnSpan
+        layout.addWidget(self._furigana_profiles_edit, 0, 0, 1, -1)
+        layout.addWidget(self._furigana_settings, 1, 0)
+        layout.addWidget(self._color_codes_settings, 1, 1)
+        # Note: furigana takes more space than pitch colors.
+        layout.setColumnStretch(0, 3)
+        layout.setColumnStretch(1, 1)
         self._tabs.addTab(tab, "Furigana")
 
         # Pitch accent
@@ -698,6 +705,7 @@ class SettingsDialog(AnkiSaveAndRestoreGeomDialog, MgrPropMixIn):
         cfg["pitch_accent"].update(self._pitch_settings.as_dict())
         cfg["svg_graphs"].update(self._svg_settings.as_dict())
         cfg["furigana"].update(self._furigana_settings.as_dict())
+        cfg["pitch_color_codes"].update(self._color_codes_settings.as_dict())
         cfg["context_menu"].update(self._context_menu_settings.as_dict())
         cfg["forvo"].update(self._forvo_settings.as_dict())
         cfg["toolbar"].update(self._toolbar_settings.as_dict())
