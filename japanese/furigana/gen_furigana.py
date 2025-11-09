@@ -192,14 +192,24 @@ class FuriganaGen:
 
         if results := self._lookup.get_pronunciations(text, recurse=False):
             for word, entries in results.items():
-                yield AccDbParsedToken(
-                    headword=word,
-                    word=word,
-                    part_of_speech=PartOfSpeech.unknown,
-                    inflection_type=Inflection.dictionary_form,
-                    katakana_reading=None,
-                    headword_accents=self.unique_headword_accents(entries),
-                )
+                if info_single := self.mecab_single_word(word):
+                    # Find part of speech.
+                    yield AccDbParsedToken(
+                        **dataclasses.asdict(info_single),
+                        headword_accents=self.unique_headword_accents(
+                            entries, part_of_speech=info_single.part_of_speech
+                        ),
+                    )
+                else:
+                    # Part of speech will not be set.
+                    yield AccDbParsedToken(
+                        headword=word,
+                        word=word,
+                        part_of_speech=PartOfSpeech.unknown,
+                        inflection_type=Inflection.dictionary_form,
+                        katakana_reading=None,
+                        headword_accents=self.unique_headword_accents(entries, part_of_speech=PartOfSpeech.unknown),
+                    )
 
     def append_accents(self, token: MecabParsedToken) -> AccDbParsedToken:
         """
@@ -207,7 +217,10 @@ class FuriganaGen:
         """
         return AccDbParsedToken(
             **dataclasses.asdict(token),
-            headword_accents=self.unique_headword_accents(self.iter_accents(token.headword)),
+            headword_accents=self.unique_headword_accents(
+                self.iter_accents(token.headword),
+                part_of_speech=token.part_of_speech,
+            ),
         )
 
     def _is_reading_preferable(self, reading: str) -> bool:
@@ -229,12 +242,14 @@ class FuriganaGen:
                 key_to_entry[access_key(entry)] = entry
         return key_to_entry.values()
 
-    def unique_headword_accents(self, entries: Iterable[FormattedEntry]) -> Sequence[PitchAccentEntry]:
+    def unique_headword_accents(
+        self, entries: Iterable[FormattedEntry], part_of_speech: PartOfSpeech
+    ) -> Sequence[PitchAccentEntry]:
         """
         Returns a list of pitch accents without duplicates.
         """
         return [
-            PitchAccentEntry.from_formatted(entry)
+            PitchAccentEntry.from_formatted(entry, part_of_speech)
             for entry in self._to_unique_readings(
                 entries,
                 access_key=lambda entry: (pr(entry.katakana_reading), entry.pitch_number),
