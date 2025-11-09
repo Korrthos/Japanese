@@ -1,5 +1,5 @@
 /*
- * AJT Japanese JS 25.4.30.1
+ * AJT Japanese JS 25.11.09.1
  * Copyright: Ajatt-Tools and contributors; https://github.com/Ajatt-Tools
  * License: GNU AGPL, version 3 or later; https://www.gnu.org/licenses/agpl-3.0.html
  */
@@ -17,37 +17,48 @@
 
     function ajt__make_pattern(kana, pitch_type, pitch_num) {
         const moras = ajt__kana_to_moras(ajt__norm_handakuten(kana));
-        switch (pitch_type) {
-            case "atamadaka":
+        pitch_num = parseInt(pitch_num);
+        switch (true) {
+            case pitch_type == "atamadaka" || pitch_num === 1:
                 return (
                     `<span class="ajt__HL">${moras[0]}</span>` +
                     `<span class="ajt__L">${moras.slice(1).join("")}</span>` +
                     `<span class="ajt__pitch_number_tag">1</span>`
                 );
                 break;
-            case "heiban":
+            case pitch_type == "heiban" || pitch_num === 0:
                 return (
                     `<span class="ajt__LH">${moras[0]}</span>` +
                     `<span class="ajt__H">${moras.slice(1).join("")}</span>` +
                     `<span class="ajt__pitch_number_tag">0</span>`
                 );
                 break;
-            case "odaka":
+            case pitch_type == "odaka" || pitch_num === moras.length:
                 return (
                     `<span class="ajt__LH">${moras[0]}</span>` +
                     `<span class="ajt__HL">${moras.slice(1).join("")}</span>` +
                     `<span class="ajt__pitch_number_tag">${moras.length}</span>`
                 );
                 break;
-            case "nakadaka":
+            case pitch_type == "nakadaka" || pitch_type == "kifuku":
                 return (
                     `<span class="ajt__LH">${moras[0]}</span>` +
-                    `<span class="ajt__HL">${moras.slice(1, Number(pitch_num)).join("")}</span>` +
-                    `<span class="ajt__L">${moras.slice(Number(pitch_num)).join("")}</span>` +
+                    `<span class="ajt__HL">${moras.slice(1, pitch_num).join("")}</span>` +
+                    `<span class="ajt__L">${moras.slice(pitch_num).join("")}</span>` +
+                    `<span class="ajt__pitch_number_tag">${pitch_num}</span>`
+                );
+                break;
+            default:
+                return (
+                    `<span>Error: ${kana} (${pitch_type})</span>` +
                     `<span class="ajt__pitch_number_tag">${pitch_num}</span>`
                 );
                 break;
         }
+        return (
+            `<span>Fatal error: ${kana} (${pitch_type})</span>` +
+            `<span class="ajt__pitch_number_tag">${pitch_num}</span>`
+        );
     }
 
     function ajt__format_new_ruby(kanji, readings) {
