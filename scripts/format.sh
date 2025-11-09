@@ -8,5 +8,6 @@ readonly ROOT_DIR=$(git rev-parse --show-toplevel)
 	--include japanese \
 	--include tests \
 	--exclude japanese/kanjigrid \
+	--exclude kanjigrid \
 	--exclude japanese/ajt_common
 prettier -w "$ROOT_DIR/japanese/note_type" "$ROOT_DIR/japanese/web"
