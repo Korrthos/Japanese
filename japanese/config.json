@@ -73,9 +73,9 @@
   },
   "pitch_color_codes": {
     "heiban": "#3366CC",
-    "atamadaka ": "red",
+    "atamadaka": "red",
     "nakadaka": "#eb8500",
-    "odaka ": "green",
+    "odaka": "green",
     "kifuku": "purple",
     "unknown": "#5f5f5f"
   },
