@@ -51,3 +51,20 @@ def test_count_moras(text_case: str, expected_mora_count: int) -> None:
 )
 def test_pitch_type_from_pitch_num(pitch_num_str: str, n_moras: int, expected_type: PitchType) -> None:
     assert pitch_type_from_pitch_num(pitch_num_str, n_moras) == expected_type
+
+
+@pytest.mark.parametrize(
+    "pitch_num_str,  n_moras",
+    [
+        ("-2", 2),
+        ("-1", 1),
+        ("0", -1),
+        ("1", 0),
+        ("3", -2),
+        ("33", 10),
+        ("44", 3),
+    ],
+)
+def test_pitch_type_from_pitch_num_value_error(pitch_num_str: str, n_moras: int):
+    with pytest.raises(ValueError):
+        pitch_type_from_pitch_num(pitch_num_str, n_moras)
