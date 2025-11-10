@@ -87,9 +87,18 @@ def test_split_pitch_numbers() -> None:
     assert split_pitch_numbers("1") == ["1"]
 
 
-def test_format_entry() -> None:
-    assert format_entry(list("あいうえお"), 2) == "<low_rise>あ</low_rise><high_drop>い</high_drop><low>うえお</low>"
-    assert format_entry(list("あいうえお"), 0) == "<low_rise>あ</low_rise><high>いうえお</high>"
-    assert format_entry(list("あいうえお"), 1) == "<high_drop>あ</high_drop><low>いうえお</low>"
-    assert format_entry(list("あ"), 1) == "<high_drop>あ</high_drop>"
-    assert format_entry(list("あ"), 0) == "<low_rise>あ</low_rise>"
+@pytest.mark.parametrize(
+    "kana,  accent,  expected",
+    [
+        ("あいうえお", 2, "<low_rise>あ</low_rise><high_drop>い</high_drop><low>うえお</low>"),
+        ("あいうえお", 0, "<low_rise>あ</low_rise><high>いうえお</high>"),
+        ("あいうえお", 5, "<low_rise>あ</low_rise><high_drop>いうえお</high_drop>"),
+        ("あいうえお", 1, "<high_drop>あ</high_drop><low>いうえお</low>"),
+        ("あ", 1, "<high_drop>あ</high_drop>"),
+        ("あ", 0, "<low_rise>あ</low_rise>"),
+    ],
+)
+def test_format_entry(kana: str, accent: int, expected: str) -> None:
+    assert format_entry(list(kana), accent) == expected
+
+
