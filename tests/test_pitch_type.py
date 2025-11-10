@@ -32,12 +32,22 @@ def test_count_moras(text_case: str, expected_mora_count: int) -> None:
     assert count_moras(text_case) == expected_mora_count
 
 
-def test_pitch_type_from_pitch_num() -> None:
-    assert pitch_type_from_pitch_num("0", 2) == PitchType.heiban
-    assert pitch_type_from_pitch_num("1", 1) == PitchType.atamadaka
-    assert pitch_type_from_pitch_num("2", 2) == PitchType.odaka
-    assert pitch_type_from_pitch_num("2", 3) == PitchType.nakadaka
-    assert pitch_type_from_pitch_num("3", 3) == PitchType.odaka
-    assert pitch_type_from_pitch_num("3", 10) == PitchType.nakadaka
-    assert pitch_type_from_pitch_num("4", 8) == PitchType.nakadaka
-    assert pitch_type_from_pitch_num("?", 8) == PitchType.unknown
+@pytest.mark.parametrize(
+    "pitch_num_str,  n_moras,  expected_type",
+    [
+        ("0", 2, PitchType.heiban),
+        ("0", 9, PitchType.heiban),
+        ("1", 1, PitchType.atamadaka),
+        ("1", 9, PitchType.atamadaka),
+        ("2", 2, PitchType.odaka),
+        ("3", 3, PitchType.odaka),
+        ("4", 4, PitchType.odaka),
+        ("2", 3, PitchType.nakadaka),
+        ("3", 10, PitchType.nakadaka),
+        ("4", 8, PitchType.nakadaka),
+        ("?", 8, PitchType.unknown),
+        ("xxx", 8, PitchType.unknown),
+    ],
+)
+def test_pitch_type_from_pitch_num(pitch_num_str: str, n_moras: int, expected_type: PitchType) -> None:
+    assert pitch_type_from_pitch_num(pitch_num_str, n_moras) == expected_type
