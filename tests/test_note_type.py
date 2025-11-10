@@ -22,7 +22,6 @@ from japanese.note_type.imports import (
     CHARSET_RULE,
     ensure_css_imports,
     ensure_js_imports,
-    find_ajt_japanese_js_imports,
     find_existing_css_version,
     is_current_js_ok,
 )

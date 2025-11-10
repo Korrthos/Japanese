@@ -3,6 +3,8 @@
 
 import os.path
 
+import pytest
+
 from japanese.mecab_controller.basic_types import Inflection, PartOfSpeech
 from japanese.pitch_accents.basic_types import (
     AccDbParsedToken,

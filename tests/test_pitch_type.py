@@ -1,9 +1,16 @@
 # Copyright: Ajatt-Tools and contributors; https://github.com/Ajatt-Tools
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+import pytest
+
+from japanese.mecab_controller.basic_types import PartOfSpeech
 from japanese.mecab_controller.kana_conv import HIRAGANA, KATAKANA
 from japanese.pitch_accents.basic_types import (
+    PitchParam,
     PitchType,
+    PitchUnknown,
+    adjust_if_kifuku,
     count_moras,
+    is_verb_or_i_adjective,
     pitch_type_from_pitch_num,
 )
 
