@@ -15,15 +15,21 @@ from japanese.pitch_accents.basic_types import (
 )
 
 
-def test_count_moras() -> None:
-    assert count_moras("あいうえお") == 5
-    assert count_moras("カキクケコ") == 5
-    assert count_moras("にゃ") == 1
-    assert count_moras("あ") == 1
-    assert count_moras("ー") == 1
-    assert count_moras("っ") == 1
-    assert count_moras("とうきょう") == 4
-    assert count_moras("きゃきゅきょ") == 3
+@pytest.mark.parametrize(
+    "text_case,  expected_mora_count",
+    [
+        ("あいうえお", 5),
+        ("カキクケコ", 5),
+        ("にゃ", 1),
+        ("あ", 1),
+        ("ー", 1),
+        ("っ", 1),
+        ("とうきょう", 4),
+        ("きゃきゅきょ", 3),
+    ],
+)
+def test_count_moras(text_case: str, expected_mora_count: int) -> None:
+    assert count_moras(text_case) == expected_mora_count
 
 
 def test_pitch_type_from_pitch_num() -> None:
