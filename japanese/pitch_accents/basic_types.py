@@ -47,9 +47,12 @@ def pitch_type_from_pitch_num(pitch_num_as_str: str, n_moras: int) -> PitchType:
         # pitch num is not a number => pitch is unknown
         return PitchType.unknown
 
-    assert pitch_num >= 0, "pitch number can't be less than 0"
-    assert n_moras > 0, "word must consist of at least 1 mora"
-    assert pitch_num <= n_moras, "pitch must drop inside the word or right after"
+    if pitch_num < 0:
+        raise ValueError("pitch number can't be less than 0")
+    if n_moras < 1:
+        raise ValueError("word must consist of at least 1 mora")
+    if pitch_num > n_moras:
+        raise ValueError("pitch must drop inside the word or right after")
 
     if pitch_num == 0:
         return PitchType.heiban
