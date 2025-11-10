@@ -78,7 +78,11 @@ def adjust_if_kifuku(part_of_speech: PartOfSpeech, pitch_type: PitchType) -> Pit
     non-heiban verbs and i-adjectives are commonly referred to as kifuku.
     """
     assert isinstance(pitch_type, PitchType), f"expected PitchType, got {type(pitch_type)}"
-    if pitch_type and is_verb_or_i_adjective(part_of_speech) and pitch_type != PitchType.heiban:
+    if (
+        pitch_type
+        and is_verb_or_i_adjective(part_of_speech)
+        and pitch_type not in (PitchType.heiban, PitchType.unknown)
+    ):
         return PitchType.kifuku
     return pitch_type
 
