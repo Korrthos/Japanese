@@ -68,3 +68,18 @@ def test_pitch_type_from_pitch_num(pitch_num_str: str, n_moras: int, expected_ty
 def test_pitch_type_from_pitch_num_value_error(pitch_num_str: str, n_moras: int):
     with pytest.raises(ValueError):
         pitch_type_from_pitch_num(pitch_num_str, n_moras)
+
+
+@pytest.mark.parametrize(
+    "part_of_speech,  expected_result",
+    [
+        (PartOfSpeech.verb, True),
+        (PartOfSpeech.i_adjective, True),
+        (PartOfSpeech.noun, False),
+        (PartOfSpeech.adverb, False),
+        (PartOfSpeech.unknown, False),
+    ],
+)
+def test_is_verb_or_i_adjective(part_of_speech: PartOfSpeech, expected_result: bool) -> None:
+    """Test the is_verb_or_i_adjective function."""
+    assert is_verb_or_i_adjective(part_of_speech) is expected_result
