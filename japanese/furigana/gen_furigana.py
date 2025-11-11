@@ -248,6 +248,8 @@ class FuriganaGen:
         """
         Returns a list of pitch accents without duplicates.
         """
+        if not self._cfg.furigana.color_code_kifuku:
+            part_of_speech = PartOfSpeech.unknown
         return [
             PitchAccentEntry.from_formatted(entry, part_of_speech)
             for entry in self._to_unique_readings(

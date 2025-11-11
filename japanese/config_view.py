@@ -84,6 +84,10 @@ class FuriganaConfigView(PitchAndFuriganaCommon):
     def maximum_pitch_accents(self) -> int:
         return int(self["maximum_pitch_accents"])
 
+    @property
+    def color_code_kifuku(self) -> bool:
+        return bool(self["color_code_kifuku"])
+
 
 @enum.unique
 class LookupDialogPitchOutputFormat(enum.Enum):

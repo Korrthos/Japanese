@@ -81,13 +81,14 @@ class ColorCodeWrapper(io.StringIO):
         don't output anything because that might mislead the user.
         """
         main_pitch_type = guess_main_pitch_type(token)
+
         if main_pitch_type == PitchUnknown.none:
             # no accent => don't color-code.
             return None
         elif main_pitch_type == PitchUnknown.many:
             # by default many accents are marked grey.
             return self._cfg.pitch_color_codes.unknown
-        else:
+        elif self._cfg.furigana.color_code_kifuku:
             # non-heiban verbs and i-adjectives are commonly referred to as kifuku.
             main_pitch_type = adjust_if_kifuku(token.part_of_speech, main_pitch_type)
         try:
