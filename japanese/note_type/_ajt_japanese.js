@@ -122,7 +122,7 @@
     function ajt__find_word_info_title(ajt_span) {
         const headword = ajt_span.getAttribute("headword") || info_title;
         const pos_ja = parts_of_speech.get(ajt_span.getAttribute("part_of_speech") || "unknown");
-        if (pos_ja == "unknown") {
+        if (!pos_ja || pos_ja == "unknown") {
             return headword;
         }
         return `${headword}・${pos_ja}`;
