@@ -127,3 +127,23 @@ def test_is_verb_or_i_adjective(part_of_speech: PartOfSpeech, expected_result: b
 def test_adjust_if_kifuku(part_of_speech: PartOfSpeech, pitch_type: PitchType, expected_result: PitchType) -> None:
     """Test the adjust_if_kifuku function."""
     assert adjust_if_kifuku(part_of_speech, pitch_type) == expected_result
+
+
+@pytest.mark.parametrize(
+    "pitch_type,  pitch_num,  n_moras,  expected_description",
+    [
+        (PitchType.kifuku, "2", 3, "kifuku-2"),
+        (PitchType.kifuku, "33", 33, "kifuku-33"),
+        (PitchType.nakadaka, "3", 6, "nakadaka-3"),
+        (PitchType.atamadaka, "1", 8, "atamadaka"),
+        (PitchType.heiban, "0", 3, "heiban"),
+        (PitchType.heiban, "0", 4, "heiban"),
+        (PitchType.odaka, "3", 3, "odaka"),
+        (PitchType.odaka, "6", 6, "odaka"),
+        (PitchType.unknown, "2", 3, "unknown"),
+    ],
+)
+def test_pitch_param_describe(pitch_type: PitchType, pitch_num: str, n_moras: int, expected_description: str) -> None:
+    """Test that PitchParam.describe() handles all pitch types correctly."""
+    param = PitchParam(type=pitch_type, number=pitch_num, n_moras=n_moras)
+    assert param.describe() == expected_description
