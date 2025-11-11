@@ -83,3 +83,47 @@ def test_pitch_type_from_pitch_num_value_error(pitch_num_str: str, n_moras: int)
 def test_is_verb_or_i_adjective(part_of_speech: PartOfSpeech, expected_result: bool) -> None:
     """Test the is_verb_or_i_adjective function."""
     assert is_verb_or_i_adjective(part_of_speech) is expected_result
+
+
+@pytest.mark.parametrize(
+    "part_of_speech,  pitch_type,  expected_result",
+    [
+        # Non-heiban verbs should be adjusted to kifuku
+        (PartOfSpeech.verb, PitchType.atamadaka, PitchType.kifuku),
+        (PartOfSpeech.verb, PitchType.nakadaka, PitchType.kifuku),
+        (PartOfSpeech.verb, PitchType.odaka, PitchType.kifuku),
+
+        # Heiban verbs should not be adjusted
+        (PartOfSpeech.verb, PitchType.heiban, PitchType.heiban),
+
+        # Non-heiban i-adjectives should be adjusted to kifuku
+        (PartOfSpeech.i_adjective, PitchType.atamadaka, PitchType.kifuku),
+        (PartOfSpeech.i_adjective, PitchType.nakadaka, PitchType.kifuku),
+        (PartOfSpeech.i_adjective, PitchType.odaka, PitchType.kifuku),
+
+        # Heiban i-adjectives should not be adjusted
+        (PartOfSpeech.i_adjective, PitchType.heiban, PitchType.heiban),
+
+        # Other parts of speech should not be adjusted
+        (PartOfSpeech.noun, PitchType.atamadaka, PitchType.atamadaka),
+        (PartOfSpeech.noun, PitchType.nakadaka, PitchType.nakadaka),
+        (PartOfSpeech.adverb, PitchType.atamadaka, PitchType.atamadaka),
+        (PartOfSpeech.bound_auxiliary, PitchType.odaka, PitchType.odaka),
+
+        # Kifuku should not be adjusted
+        (PartOfSpeech.bound_auxiliary, PitchType.kifuku, PitchType.kifuku),
+        (PartOfSpeech.verb, PitchType.kifuku, PitchType.kifuku),
+        (PartOfSpeech.i_adjective, PitchType.kifuku, PitchType.kifuku),
+
+        # Unknown parts of speech should not be adjusted
+        (PartOfSpeech.unknown, PitchType.atamadaka, PitchType.atamadaka),
+        (PartOfSpeech.unknown, PitchType.unknown, PitchType.unknown),
+        (PartOfSpeech.unknown, PitchType.heiban, PitchType.heiban),
+
+        # Unknown pitch types should not be adjusted
+        (PartOfSpeech.verb, PitchType.unknown, PitchType.unknown),
+    ],
+)
+def test_adjust_if_kifuku(part_of_speech: PartOfSpeech, pitch_type: PitchType, expected_result: PitchType) -> None:
+    """Test the adjust_if_kifuku function."""
+    assert adjust_if_kifuku(part_of_speech, pitch_type) == expected_result
