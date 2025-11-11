@@ -1,5 +1,5 @@
 /*
- * AJT Japanese JS 25.11.09.1
+ * AJT Japanese JS 25.11.12.1
  * Copyright: Ajatt-Tools and contributors; https://github.com/Ajatt-Tools
  * License: GNU AGPL, version 3 or later; https://www.gnu.org/licenses/agpl-3.0.html
  */
