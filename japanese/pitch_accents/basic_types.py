@@ -70,6 +70,7 @@ def count_moras(katakana_reading: str) -> int:
 
 
 def is_verb_or_i_adjective(part_of_speech: PartOfSpeech) -> bool:
+    assert isinstance(part_of_speech, PartOfSpeech), f"expected PartOfSpeech, got {type(part_of_speech)}"
     return part_of_speech in (PartOfSpeech.verb, PartOfSpeech.i_adjective)
 
 
