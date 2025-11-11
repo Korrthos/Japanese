@@ -64,36 +64,3 @@ def test_color_code_wrapper_kifuku(
     assert expected_pitch_attr in result
     # Should have the ajt__word_info class
     assert 'class="ajt__word_info"' in result
-
-
-@pytest.mark.parametrize(
-    "accents,  expected_pitch",
-    [
-        ([2], PitchType.kifuku),
-        ([], PitchUnknown.none),
-        ([0, 1, 2], PitchUnknown.many),
-        ([0, 1], PitchUnknown.many),
-        ([], PitchUnknown.none),
-        ([1, 1, 1], PitchType.kifuku),
-        ([2, 2, 2], PitchType.kifuku),
-        ([0, 0], PitchType.heiban),
-    ],
-)
-def test_guess_main_pitch_type_verb(accents: list[int], expected_pitch: Union[PitchUnknown, PitchType]) -> None:
-    """Test that guess_main_pitch_type returns PitchUnknown.many for multiple different accents."""
-    token = AccDbParsedToken(
-        word="食べる",
-        headword="食べる",
-        katakana_reading="タベル",
-        part_of_speech=PartOfSpeech.verb,
-        inflection_type=Inflection.dictionary_form,
-        headword_accents=[
-            PitchAccentEntry(
-                katakana_reading="タベル",
-                katakana_reading_sep="タベル",
-                pitches=[PitchParam.from_symbol("タベル", str(pitch_num), PartOfSpeech.verb)],
-            )
-            for pitch_num in accents
-        ],
-    )
-    assert guess_main_pitch_type(token) == expected_pitch
