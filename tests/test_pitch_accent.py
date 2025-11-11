@@ -88,25 +88,25 @@ from japanese.pitch_accents.format_accents import format_entry
             "タベル:kifuku-1",
         ),
         (
-                AccDbParsedToken(
-                    word="食べる",
-                    headword="食べる",
-                    katakana_reading="タベル",
-                    part_of_speech=PartOfSpeech.verb,
-                    inflection_type=Inflection.dictionary_form,
-                    headword_accents=(
-                            PitchAccentEntry.from_formatted(
-                                FormattedEntry(
-                                    raw_headword="食べる",
-                                    katakana_reading="タベル",
-                                    pitch_number="2",
-                                    html_notation="タベル",
-                                ),
-                                PartOfSpeech.verb,
-                            ),
+            AccDbParsedToken(
+                word="食べる",
+                headword="食べる",
+                katakana_reading="タベル",
+                part_of_speech=PartOfSpeech.verb,
+                inflection_type=Inflection.dictionary_form,
+                headword_accents=(
+                    PitchAccentEntry.from_formatted(
+                        FormattedEntry(
+                            raw_headword="食べる",
+                            katakana_reading="タベル",
+                            pitch_number="2",
+                            html_notation="タベル",
+                        ),
+                        PartOfSpeech.verb,
                     ),
                 ),
-                "タベル:kifuku-2",
+            ),
+            "タベル:kifuku-2",
         ),
         (
             AccDbParsedToken(
@@ -210,7 +210,7 @@ def test_kifuku_pitch_handling_in_pitch_accent_entry(
             raw_headword=raw_headword,
             katakana_reading=katakana_reading,
             pitch_number=pitch_number,
-            html_notation=katakana_reading, # doesn't matter in this test.
+            html_notation=katakana_reading,  # doesn't matter in this test.
         ),
         part_of_speech,
     )
