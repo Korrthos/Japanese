@@ -194,8 +194,8 @@ class FuriganaGen:
             for word, entries in results.items():
                 if info_single := self.mecab_single_word(word):
                     # Find part of speech.
-                    yield AccDbParsedToken(
-                        **dataclasses.asdict(info_single),
+                    yield AccDbParsedToken.from_mecab_parsed(
+                        info_single,
                         headword_accents=self.unique_headword_accents(
                             entries, part_of_speech=info_single.part_of_speech
                         ),
@@ -215,8 +215,8 @@ class FuriganaGen:
         """
         Append readings from the accent dictionary to the reading given by mecab.
         """
-        return AccDbParsedToken(
-            **dataclasses.asdict(token),
+        return AccDbParsedToken.from_mecab_parsed(
+            token,
             headword_accents=self.unique_headword_accents(
                 self.iter_accents(token.headword),
                 part_of_speech=token.part_of_speech,

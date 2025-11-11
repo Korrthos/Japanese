@@ -177,3 +177,12 @@ class AccDbParsedToken(MecabParsedToken):
 
     def has_pitch(self) -> bool:
         return bool(self.headword_accents and all(token.has_accent() for token in self.headword_accents))
+
+    @classmethod
+    def from_mecab_parsed(
+        cls, mpt: MecabParsedToken, headword_accents: Sequence[PitchAccentEntry]
+    ) -> "AccDbParsedToken":
+        return cls(
+            **dataclasses.asdict(mpt),
+            headword_accents=headword_accents,
+        )
