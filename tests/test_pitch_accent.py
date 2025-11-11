@@ -182,3 +182,36 @@ def test_kifuku_pitch_handling_in_pitch_param(
     assert param.describe() == expected_description
 
 
+@pytest.mark.parametrize(
+    "raw_headword,  katakana_reading,  pitch_number,  part_of_speech,  expected_description",
+    [
+        ("食べる", "タベル", "1", PartOfSpeech.verb, "タベル:kifuku-1"),
+        ("食べる", "タベル", "2", PartOfSpeech.verb, "タベル:kifuku-2"),
+        ("食べる", "タベル", "3", PartOfSpeech.verb, "タベル:kifuku-3"),
+        ("食べる", "タベル", "0", PartOfSpeech.verb, "タベル:heiban"),
+        ("高い", "タカイ", "2", PartOfSpeech.i_adjective, "タカイ:kifuku-2"),
+        ("高い", "タカイ", "0", PartOfSpeech.i_adjective, "タカイ:heiban"),
+        ("電話", "デンワ", "1", PartOfSpeech.noun, "デンワ:atamadaka"),
+        ("電話", "デンワ", "2", PartOfSpeech.noun, "デンワ:nakadaka-2"),
+        ("納屋", "なや", "0", PartOfSpeech.noun, "なや:heiban"),
+        ("納屋", "なや", "1", PartOfSpeech.noun, "なや:atamadaka"),
+    ],
+)
+def test_kifuku_pitch_handling_in_pitch_accent_entry(
+    raw_headword: str,
+    katakana_reading: str,
+    pitch_number: str,
+    part_of_speech: PartOfSpeech,
+    expected_description: str,
+) -> None:
+    """Test that kifuku pitch type is handled correctly in PitchAccentEntry.from_formatted."""
+    entry = PitchAccentEntry.from_formatted(
+        FormattedEntry(
+            raw_headword=raw_headword,
+            katakana_reading=katakana_reading,
+            pitch_number=pitch_number,
+            html_notation=katakana_reading, # doesn't matter in this test.
+        ),
+        part_of_speech,
+    )
+    assert entry.describe_pitches() == expected_description
