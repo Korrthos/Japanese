@@ -155,3 +155,30 @@ def test_format_entry(kana: str, accent: int, expected: str) -> None:
     assert format_entry(list(kana), accent) == expected
 
 
+@pytest.mark.parametrize(
+    "word,  pitch_number,  part_of_speech,  expected_type,  expected_description",
+    [
+        ("たべる", "1", PartOfSpeech.verb, PitchType.kifuku, "kifuku-1"),
+        ("たべる", "2", PartOfSpeech.verb, PitchType.kifuku, "kifuku-2"),
+        ("たべる", "3", PartOfSpeech.verb, PitchType.kifuku, "kifuku-3"),
+        ("あける", "3", PartOfSpeech.verb, PitchType.kifuku, "kifuku-3"),
+        ("高い", "2", PartOfSpeech.i_adjective, PitchType.kifuku, "kifuku-2"),
+        ("美しい", "3", PartOfSpeech.i_adjective, PitchType.kifuku, "kifuku-3"),
+        ("あける", "0", PartOfSpeech.verb, PitchType.heiban, "heiban"),
+        ("電話", "1", PartOfSpeech.noun, PitchType.atamadaka, "atamadaka"),
+        ("納屋", "0", PartOfSpeech.noun, PitchType.heiban, "heiban"),
+    ],
+)
+def test_kifuku_pitch_handling_in_pitch_param(
+    word: str,
+    pitch_number: str,
+    part_of_speech: PartOfSpeech,
+    expected_type: PitchType,
+    expected_description: str,
+) -> None:
+    """Test that kifuku pitch type is handled correctly in PitchParam.from_symbol."""
+    param = PitchParam.from_symbol(word, pitch_number, part_of_speech)
+    assert param.type == expected_type
+    assert param.describe() == expected_description
+
+
