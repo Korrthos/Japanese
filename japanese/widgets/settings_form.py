@@ -275,6 +275,10 @@ class FuriganaSettingsForm(MultiColumnSettingsForm):
 
     def _add_tooltips(self) -> None:
         super()._add_tooltips()
+        self._widgets.color_code_kifuku.setToolTip(
+            "Non-heiban verbs and i-adjectives are sometimes referred to as Kifuku.\n"
+            "This setting allows painting them with a unique color."
+        )
         self._widgets.skip_numbers.setToolTip("Don't add furigana to numbers.")
         self._widgets.prefer_literal_pronunciation.setToolTip(
             "Print furigana in a way that shows a word's literal pronunciation."
