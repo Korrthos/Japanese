@@ -119,7 +119,7 @@ ol.ajt__readings_list {
 }
 
 .ajt__frame_title {
-    /* Title bar (says "Information") */
+    /* Title bar (says "Information" or prints the current word and its part of speech) */
     text-align: center;
     background-color: rgb(197, 197, 197);
     font-size: 1rem;
