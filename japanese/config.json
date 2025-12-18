@@ -1,201 +1,201 @@
 {
-  "cache_lookups": 8192,
-  "last_file_save_location": "",
-  "show_welcome_guide": true,
-  "insert_scripts_into_templates": true,
-  "profiles": [
-    {
-      "name": "Add furigana for sentence",
-      "note_type": "japanese",
-      "source": "SentKanji",
-      "destination": "SentFurigana",
-      "mode": "furigana",
-      "split_morphemes": true,
-      "triggered_by": "focus_lost,toolbar_button,note_added,bulk_add",
-      "overwrite_destination": false,
-      "color_code_pitch": ""
+    "cache_lookups": 8192,
+    "last_file_save_location": "",
+    "show_welcome_guide": true,
+    "insert_scripts_into_templates": true,
+    "profiles": [
+        {
+            "name": "Add furigana for sentence",
+            "note_type": "japanese",
+            "source": "SentKanji",
+            "destination": "SentFurigana",
+            "mode": "furigana",
+            "split_morphemes": true,
+            "triggered_by": "focus_lost,toolbar_button,note_added,bulk_add",
+            "overwrite_destination": false,
+            "color_code_pitch": "attributes,underline"
+        },
+        {
+            "name": "Add furigana for word",
+            "note_type": "japanese",
+            "source": "VocabKanji",
+            "destination": "VocabFurigana",
+            "mode": "furigana",
+            "split_morphemes": false,
+            "triggered_by": "focus_lost,toolbar_button,note_added,bulk_add",
+            "overwrite_destination": false,
+            "color_code_pitch": "attributes,underline"
+        },
+        {
+            "name": "Add pitch accent for word",
+            "note_type": "japanese",
+            "source": "VocabKanji",
+            "destination": "VocabPitchPattern",
+            "mode": "pitch",
+            "split_morphemes": false,
+            "output_format": "html_and_number",
+            "triggered_by": "focus_lost,toolbar_button,note_added,bulk_add",
+            "overwrite_destination": false
+        },
+        {
+            "name": "Add audio for word",
+            "note_type": "Japanese",
+            "source": "VocabKanji",
+            "destination": "VocabAudio",
+            "mode": "audio",
+            "split_morphemes": false,
+            "triggered_by": "focus_lost,toolbar_button,note_added,bulk_add",
+            "overwrite_destination": false
+        }
+    ],
+    "pitch_accent": {
+        "lookup_shortcut": "Ctrl+8",
+        "lookup_pitch_format": "svg",
+        "output_hiragana": false,
+        "kana_lookups": true,
+        "skip_numbers": true,
+        "reading_separator": ", ",
+        "word_separator": "; ",
+        "blocklisted_words": "わ,は,と,た,ね,さ,いる,ましょ,び,たち,こと,へ,たい,が,ば,から,て,ん,に,や,で,ます,し,です,き,だ,も,私,する,か,よ,てる,う,お,ない,な,の,せる,そりゃ,あもう,め,げ,く",
+        "maximum_results": 3,
+        "html_style": "u_biq"
     },
-    {
-      "name": "Add furigana for word",
-      "note_type": "japanese",
-      "source": "VocabKanji",
-      "destination": "VocabFurigana",
-      "mode": "furigana",
-      "split_morphemes": false,
-      "triggered_by": "focus_lost,toolbar_button,note_added,bulk_add",
-      "overwrite_destination": false,
-      "color_code_pitch": ""
+    "furigana": {
+        "skip_numbers": true,
+        "prefer_literal_pronunciation": false,
+        "reading_separator": ",",
+        "blocklisted_words": "人",
+        "mecab_only": "母,先生,弟,空,猫,お前,女性,体,男,首,女,彼,顔,お,木,頭,僕,行く,私,放る",
+        "maximum_results": 3,
+        "maximum_pitch_accents": 3
     },
-    {
-      "name": "Add pitch accent for word",
-      "note_type": "japanese",
-      "source": "VocabKanji",
-      "destination": "VocabPitchPattern",
-      "mode": "pitch",
-      "split_morphemes": false,
-      "output_format": "html_and_number",
-      "triggered_by": "focus_lost,toolbar_button,note_added,bulk_add",
-      "overwrite_destination": false
+    "context_menu": {
+        "generate_furigana": true,
+        "to_katakana": true,
+        "to_hiragana": true,
+        "to_half_width_katakana": true,
+        "literal_pronunciation": true,
+        "look_up_word": true,
+        "browser_search": true,
+        "remove_spaces": true
     },
-    {
-      "name": "Add audio for word",
-      "note_type": "Japanese",
-      "source": "VocabKanji",
-      "destination": "VocabAudio",
-      "mode": "audio",
-      "split_morphemes": false,
-      "triggered_by": "focus_lost,toolbar_button,note_added,bulk_add",
-      "overwrite_destination": false
+    "toolbar": {
+        "generate_all_button": {
+            "enabled": true,
+            "shortcut": "Alt+P",
+            "text": "入"
+        },
+        "regenerate_all_button": {
+            "enabled": true,
+            "shortcut": "Alt+;",
+            "text": "再"
+        },
+        "furigana_button": {
+            "enabled": false,
+            "shortcut": "",
+            "text": "振"
+        },
+        "hiragana_button": {
+            "enabled": false,
+            "shortcut": "",
+            "text": "平"
+        },
+        "clean_furigana_button": {
+            "enabled": false,
+            "shortcut": "",
+            "text": "削"
+        },
+        "audio_search_button": {
+            "enabled": true,
+            "shortcut": "Alt+F",
+            "text": "検"
+        }
+    },
+    "audio_sources": [
+        {
+            "enabled": true,
+            "name": "NHK-2016",
+            "url": "https://github.com/Ajatt-Tools/nhk_2016_pronunciations_index/releases/latest/download/NHK-2016_main.zip"
+        },
+        {
+            "enabled": true,
+            "name": "NHK-1998",
+            "url": "https://github.com/Ajatt-Tools/nhk_1998_pronunciations_index/releases/latest/download/NHK-1998_main.zip"
+        },
+        {
+            "enabled": true,
+            "name": "Shinmeikai-8",
+            "url": "https://github.com/Ajatt-Tools/shinmeikai_8_pronunciations_index/releases/latest/download/Shinmeikai-8_main.zip"
+        },
+        {
+            "enabled": true,
+            "name": "Daijisen",
+            "url": "https://github.com/Ajatt-Tools/daijisen_pronunciations_index/releases/latest/download/Daijisen_main.zip"
+        },
+        {
+            "enabled": true,
+            "name": "TAAS",
+            "url": "https://github.com/Ajatt-Tools/taas_pronunciations_index/releases/latest/download/TAAS_main.zip"
+        },
+        {
+            "enabled": true,
+            "name": "JapanesePod101",
+            "url": "https://github.com/Ajatt-Tools/jpod_pronunciations_index/releases/latest/download/JapanesePod101_main.zip"
+        },
+        {
+            "enabled": true,
+            "name": "Oubunsha-Kogo",
+            "url": "https://github.com/Ajatt-Tools/oubunsha_kogo_pronunciations_index/releases/latest/download/Oubunsha-Kogo_main.zip"
+        }
+    ],
+    "audio_settings": {
+        "dictionary_download_timeout": 30,
+        "audio_download_timeout": 6,
+        "attempts": 4,
+        "maximum_results": 99,
+        "ignore_inflections": true,
+        "stop_if_one_source_has_results": true,
+        "search_dialog_src_field_name": "VocabKanji",
+        "search_dialog_dest_field_name": "VocabAudio",
+        "tag_separator": "<br>"
+    },
+    "forvo": {
+        "enable_forvo_search": true,
+        "language": "ja",
+        "preferred_usernames": "akitomo,skent",
+        "preferred_countries": "Japan",
+        "show_gender": true,
+        "show_country": false,
+        "timeout_seconds": 5,
+        "retry_attempts": 3,
+        "audio_format": "ogg"
+    },
+    "definitions": {
+        "timeout": 10,
+        "remove_marks": true,
+        "dict_name": "meikyou",
+        "search_type": "exact",
+        "source": "VocabKanji",
+        "destination": "VocabDef",
+        "behavior": "append"
+    },
+    "svg_graphs": {
+        "include_text": true,
+        "graph_horizontal_padding": 6,
+        "size_unit": 25,
+        "x_step": 50,
+        "text_dx": -12,
+        "tspan_dx": -1,
+        "graph_height": 40,
+        "graph_visible_height": 100,
+        "stroke_width": 2.5,
+        "circle_radius": 5.25,
+        "font_size": 24.0,
+        "letter_spacing": -4.0,
+        "devoiced_circle_width": 1.5,
+        "devoiced_circle_radius": 17.0,
+        "devoiced_circle_dy": 3,
+        "devoiced_rectangle_padding": 2.0,
+        "devoiced_stroke_dasharray": "2 3"
     }
-  ],
-  "pitch_accent": {
-    "lookup_shortcut": "Ctrl+8",
-    "lookup_pitch_format": "svg",
-    "output_hiragana": false,
-    "kana_lookups": true,
-    "skip_numbers": true,
-    "reading_separator": ", ",
-    "word_separator": "; ",
-    "blocklisted_words": "わ,は,と,た,ね,さ,いる,ましょ,び,たち,こと,へ,たい,が,ば,から,て,ん,に,や,で,ます,し,です,き,だ,も,私,する,か,よ,てる,う,お,ない,な,の,せる,そりゃ,あもう,め,げ,く",
-    "maximum_results": 3,
-    "html_style": "u_biq"
-  },
-  "furigana": {
-    "skip_numbers": true,
-    "prefer_literal_pronunciation": false,
-    "reading_separator": ",",
-    "blocklisted_words": "人",
-    "mecab_only": "母,先生,弟,空,猫,お前,女性,体,男,首,女,彼,顔,お,木,頭,僕,行く,私,放る",
-    "maximum_results": 3,
-    "maximum_pitch_accents": 3
-  },
-  "context_menu": {
-    "generate_furigana": true,
-    "to_katakana": true,
-    "to_hiragana": true,
-    "to_half_width_katakana": true,
-    "literal_pronunciation": true,
-    "look_up_word": true,
-    "browser_search": true,
-    "remove_spaces": true
-  },
-  "toolbar": {
-    "generate_all_button": {
-      "enabled": true,
-      "shortcut": "Alt+P",
-      "text": "入"
-    },
-    "regenerate_all_button": {
-      "enabled": true,
-      "shortcut": "Alt+;",
-      "text": "再"
-    },
-    "furigana_button": {
-      "enabled": false,
-      "shortcut": "",
-      "text": "振"
-    },
-    "hiragana_button": {
-      "enabled": false,
-      "shortcut": "",
-      "text": "平"
-    },
-    "clean_furigana_button": {
-      "enabled": false,
-      "shortcut": "",
-      "text": "削"
-    },
-    "audio_search_button": {
-      "enabled": true,
-      "shortcut": "Alt+F",
-      "text": "検"
-    }
-  },
-  "audio_sources": [
-    {
-      "enabled": true,
-      "name": "NHK-2016",
-      "url": "https://github.com/Ajatt-Tools/nhk_2016_pronunciations_index/releases/latest/download/NHK-2016_main.zip"
-    },
-    {
-      "enabled": true,
-      "name": "NHK-1998",
-      "url": "https://github.com/Ajatt-Tools/nhk_1998_pronunciations_index/releases/latest/download/NHK-1998_main.zip"
-    },
-    {
-      "enabled": true,
-      "name": "Shinmeikai-8",
-      "url": "https://github.com/Ajatt-Tools/shinmeikai_8_pronunciations_index/releases/latest/download/Shinmeikai-8_main.zip"
-    },
-    {
-      "enabled": true,
-      "name": "Daijisen",
-      "url": "https://github.com/Ajatt-Tools/daijisen_pronunciations_index/releases/latest/download/Daijisen_main.zip"
-    },
-    {
-      "enabled": true,
-      "name": "TAAS",
-      "url": "https://github.com/Ajatt-Tools/taas_pronunciations_index/releases/latest/download/TAAS_main.zip"
-    },
-    {
-      "enabled": true,
-      "name": "JapanesePod101",
-      "url": "https://github.com/Ajatt-Tools/jpod_pronunciations_index/releases/latest/download/JapanesePod101_main.zip"
-    },
-    {
-      "enabled": true,
-      "name": "Oubunsha-Kogo",
-      "url": "https://github.com/Ajatt-Tools/oubunsha_kogo_pronunciations_index/releases/latest/download/Oubunsha-Kogo_main.zip"
-    }
-  ],
-  "audio_settings": {
-    "dictionary_download_timeout": 30,
-    "audio_download_timeout": 6,
-    "attempts": 4,
-    "maximum_results": 99,
-    "ignore_inflections": true,
-    "stop_if_one_source_has_results": true,
-    "search_dialog_src_field_name": "VocabKanji",
-    "search_dialog_dest_field_name": "VocabAudio",
-    "tag_separator": "<br>"
-  },
-  "forvo": {
-    "enable_forvo_search": true,
-    "language": "ja",
-    "preferred_usernames": "akitomo,skent",
-    "preferred_countries": "Japan",
-    "show_gender": true,
-    "show_country": false,
-    "timeout_seconds": 5,
-    "retry_attempts": 3,
-    "audio_format": "ogg"
-  },
-  "definitions": {
-    "timeout": 10,
-    "remove_marks": true,
-    "dict_name": "meikyou",
-    "search_type": "exact",
-    "source": "VocabKanji",
-    "destination": "VocabDef",
-    "behavior": "append"
-  },
-  "svg_graphs": {
-    "include_text": true,
-    "graph_horizontal_padding": 6,
-    "size_unit": 25,
-    "x_step": 50,
-    "text_dx": -12,
-    "tspan_dx": -1,
-    "graph_height": 40,
-    "graph_visible_height": 100,
-    "stroke_width": 2.5,
-    "circle_radius": 5.25,
-    "font_size": 24.0,
-    "letter_spacing": -4.0,
-    "devoiced_circle_width": 1.5,
-    "devoiced_circle_radius": 17.0,
-    "devoiced_circle_dy": 3,
-    "devoiced_rectangle_padding": 2.0,
-    "devoiced_stroke_dasharray": "2 3"
-  }
 }
