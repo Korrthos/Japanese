@@ -1,11 +1,17 @@
 # Copyright: Ajatt-Tools and contributors; https://github.com/Ajatt-Tools
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+import collections
 import io
-from typing import Optional
+from typing import Optional, Union
 
 from ..config_view import JapaneseConfig
 from ..helpers.profiles import ColorCodePitchFormat
-from ..pitch_accents.basic_types import AccDbParsedToken, PitchColor, PitchType
+from ..pitch_accents.basic_types import (
+    AccDbParsedToken,
+    PitchType,
+    PitchUnknown,
+    adjust_if_kifuku,
+)
 from .attach_rules import SKIP_COLORING
 
 
@@ -18,25 +24,17 @@ def should_skip_coloring(token: AccDbParsedToken) -> bool:
     return token.part_of_speech in SKIP_COLORING or not token.has_pitch()
 
 
-def get_main_pitch_color(token: AccDbParsedToken) -> Optional[str]:
-    """
-    Determine pitch color based on available accents.
-    If the word has many different accents (e.g. heiban and atamadaka),
-    don't output anything because that might mislead the user.
-    """
-    main_pitch_type: Optional[PitchType] = None
-    for entry in token.headword_accents:
-        for accent in entry.pitches:
-            if not main_pitch_type:
-                main_pitch_type = accent.type
-            elif main_pitch_type != accent.type:
-                return PitchColor.unknown.value
-    if not main_pitch_type:
-        return None
-    try:
-        return PitchColor[main_pitch_type.name].value
-    except KeyError:
-        return PitchColor.unknown.value
+def guess_main_pitch_type(token: AccDbParsedToken) -> Union[PitchType, PitchUnknown]:
+    pitch_types = collections.Counter(accent.type for entry in token.headword_accents for accent in entry.pitches)
+    if len(pitch_types) == 1:
+        # return the most common pitch (the first).
+        return pitch_types.most_common(1)[0][0]
+    elif len(pitch_types) > 1:
+        # many pitch accents for one word
+        return PitchUnknown.many
+    else:
+        # no pitch accent at all
+        return PitchUnknown.none
 
 
 class ColorCodeWrapper(io.StringIO):
@@ -76,13 +74,36 @@ class ColorCodeWrapper(io.StringIO):
             self._end_wrap()
         return super().getvalue()
 
+    def _get_main_pitch_color(self, token: AccDbParsedToken) -> Optional[str]:
+        """
+        Determine pitch color based on available accents.
+        If the word has many different accents (e.g. heiban and atamadaka),
+        don't output anything because that might mislead the user.
+        """
+        main_pitch_type = guess_main_pitch_type(token)
+
+        if main_pitch_type == PitchUnknown.none:
+            # no accent => don't color-code.
+            return None
+        elif main_pitch_type == PitchUnknown.many:
+            # by default many accents are marked grey.
+            return self._cfg.pitch_color_codes.unknown
+        elif self._cfg.furigana.color_code_kifuku:
+            # non-heiban verbs and i-adjectives are commonly referred to as kifuku.
+            main_pitch_type = adjust_if_kifuku(token.part_of_speech, main_pitch_type)
+        try:
+            return self._cfg.pitch_color_codes.lookup_color(main_pitch_type)
+        except KeyError:
+            return self._cfg.pitch_color_codes.unknown
+
     def _start_wrap(self) -> None:
         assert self._output_format != ColorCodePitchFormat(0)
         self.write(f'<span class="ajt__word_info"')
         if ColorCodePitchFormat.attributes in self._output_format:
             self.write(f' part_of_speech="{self._token.part_of_speech.name}"')
             self.write(f' pitch="{self._token.describe_pitches(self._cfg.furigana.maximum_pitch_accents)}"')
-        if html_color := get_main_pitch_color(self._token):
+            self.write(f' headword="{self._token.headword}"')
+        if html_color := self._get_main_pitch_color(self._token):
             self._write_inline_color(html_color)
         self.write(">")
 
@@ -102,6 +123,7 @@ class ColorCodeWrapper(io.StringIO):
         if ColorCodePitchFormat.color in self._output_format:
             self.write(f"color: {html_color};")
         if ColorCodePitchFormat.color | ColorCodePitchFormat.underline in self._output_format:
+            # if color and underline are both enabled, add a space between the attributes.
             self.write(" ")
         if ColorCodePitchFormat.underline in self._output_format:
             self.write(

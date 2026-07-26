@@ -12,6 +12,7 @@ def start_addon() -> None:
         context_menu,
         editor_toolbar,
         gui,
+        kanjigrid_addon,
         lookup_dialog,
         tasks,
         welcome_dialog,
@@ -30,6 +31,7 @@ def start_addon() -> None:
     editor_toolbar.init()
     welcome_dialog.init()
     note_type.init()
+    kanjigrid_addon.init()
 
 
 if mw and "pytest" not in sys.modules:

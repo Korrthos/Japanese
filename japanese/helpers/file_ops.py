@@ -36,9 +36,9 @@ def rm_file(path: Union[str, pathlib.Path]) -> None:
         pass
 
 
-def find_file_in_parents(file_name: str) -> pathlib.Path:
+def find_file_in_parents(file_name: str, start_from: str = __file__) -> pathlib.Path:
     """Used when testing/debugging."""
-    for parent_dir in walk_parents(__file__):
+    for parent_dir in walk_parents(start_from):
         if (path := parent_dir.joinpath(file_name)).is_file():
             return path
     raise RuntimeError(f"couldn't find file '{file_name}'")

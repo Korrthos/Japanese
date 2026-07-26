@@ -20,12 +20,12 @@ from japanese.note_type.bundled_files import (
 from japanese.note_type.files_in_col_media import FileInCollection
 from japanese.note_type.imports import (
     CHARSET_RULE,
-    ensure_css_imported,
-    ensure_js_imported,
-    find_ajt_japanese_js_imports,
+    ensure_css_imports,
+    ensure_js_imports,
     find_existing_css_version,
     is_current_js_ok,
 )
+from japanese.note_type.types import ChangeImportsAction
 
 RE_EXPECTED_FILENAME = re.compile(r"_ajt_japanese_(\d+\.){4}(js|css)")
 
@@ -69,50 +69,71 @@ def test_find_existing_css_version(test_input: str, expected: Optional[FileVersi
 
 
 @pytest.mark.parametrize(
-    "css_styling, is_modified, modified_css",
+    "css_styling, is_added, added_css, is_removed, removed_css",
     [
         (
             # Import is missing.
             """/* NO CSS */""",
             True,
             f"{CHARSET_RULE}\n{BUNDLED_CSS_FILE.import_str}\n/* NO CSS */",
+            False,
+            None,
         ),
         (
             # Charset is declared.
             f"""{CHARSET_RULE}\n/*Other CSS*/""",
             True,
             f"{CHARSET_RULE}\n{BUNDLED_CSS_FILE.import_str}\n/*Other CSS*/",
+            False,
+            None,
         ),
         (
             # Legacy import found.
             """@import url("_ajt_japanese.css");\n/* Other CSS */""",
             True,
             f"{CHARSET_RULE}\n{BUNDLED_CSS_FILE.import_str}\n/* Other CSS */",
+            True,
+            """/* Other CSS */""",
         ),
         (
             # Older version
             """/* Other CSS */\n@import url("_ajt_japanese_1.1.1.1.css");\n/* Other CSS */""",
             True,
             f"{CHARSET_RULE}\n/* Other CSS */\n{BUNDLED_CSS_FILE.import_str}\n/* Other CSS */",
+            True,
+            """/* Other CSS */\n/* Other CSS */""",
         ),
         (
             # Current version
             f"{CHARSET_RULE}\n{BUNDLED_CSS_FILE.import_str}\n/* Other CSS */\n/* Other CSS */\n",
             False,
             None,
+            True,
+            f"{CHARSET_RULE}\n/* Other CSS */\n/* Other CSS */\n",
         ),
         (
             # Newer version
             f"""{CHARSET_RULE}\n/* Other CSS */\n@import url("_ajt_japanese_999.1.1.1.css");\n/* Other CSS */""",
             False,
             None,
+            True,
+            f"""{CHARSET_RULE}\n/* Other CSS */\n/* Other CSS */""",
         ),
     ],
 )
-def test_css_imports(css_styling: str, is_modified: bool, modified_css: Optional[str]) -> None:
-    model_dict: AnkiNoteTypeDict = {"css": css_styling, "name": "pytest", "tmpls": []}
-    assert ensure_css_imported(model_dict) is is_modified
-    assert model_dict["css"] == (modified_css or css_styling)
+def test_css_imports(
+    css_styling: str, is_added: bool, added_css: Optional[str], is_removed: bool, removed_css: Optional[str]
+) -> None:
+    def make_model_dict() -> AnkiNoteTypeDict:
+        return {"css": css_styling, "name": "pytest", "tmpls": [], "flds": []}
+
+    model_dict = make_model_dict()
+    assert ensure_css_imports(model_dict, action=ChangeImportsAction.add) is is_added
+    assert model_dict["css"] == (added_css or css_styling)
+
+    model_dict = make_model_dict()
+    assert ensure_css_imports(model_dict, action=ChangeImportsAction.remove) is is_removed
+    assert model_dict["css"] == (removed_css or css_styling)
 
 
 NO_JS = """\
@@ -133,43 +154,55 @@ OLD_VER = """\
 
 
 @pytest.mark.parametrize(
-    "template_html, is_modified, modified_html",
+    "template_html, is_added, added_html, is_removed, removed_html",
     [
         (
             # Import is missing.
             NO_JS,
             True,
             f"{NO_JS}\n{BUNDLED_JS_FILE.import_str}",
+            False,
+            None,
         ),
         (
             # Legacy import found (script defer).
             """<!-- begin -->\n<script defer src="_ajt_japanese_24.7.14.2.js"></script>\n<!-- end -->""",
             True,
             f"<!-- begin -->\n<!-- end -->\n{BUNDLED_JS_FILE.import_str}",
+            True,
+            """<!-- begin -->\n<!-- end -->""",
         ),
         (
             # Legacy import found.
             """<!-- begin -->\n<script src="_ajt_japanese.js"></script>\n<!-- end -->""",
             True,
             f"<!-- begin -->\n<!-- end -->\n{BUNDLED_JS_FILE.import_str}",
+            True,
+            """<!-- begin -->\n<!-- end -->""",
         ),
         (
             # Older version
             f"{OLD_VER}\n<!-- after old import -->",
             True,
             f"<!-- after old import -->\n{BUNDLED_JS_FILE.import_str}",
+            True,
+            f"<!-- after old import -->",
         ),
         (
             # Older version (but it is formatted)
             f"<!--whatever-->\n\n{OLD_VER}\n<!--whatever-->",
             True,
             f"<!--whatever-->\n\n<!--whatever-->\n{BUNDLED_JS_FILE.import_str}",
+            True,
+            f"<!--whatever-->\n\n<!--whatever-->",
         ),
         (
             # Current version
             f"<!-- before current JS -->\n{BUNDLED_JS_FILE.import_str}\n<!-- after current JS -->",
             False,
             None,
+            True,
+            f"<!-- before current JS -->\n<!-- after current JS -->",
         ),
         (
             # Current version (repeated for some reason)
@@ -188,6 +221,12 @@ OLD_VER = """\
 <!-- template text 2 -->
 <!-- template text 3 -->
 {BUNDLED_JS_FILE.import_str}\
+""",
+            True,
+            f"""\
+<!-- template text 1 -->
+<!-- template text 2 -->
+<!-- template text 3 -->\
 """,
         ),
         (
@@ -196,26 +235,42 @@ OLD_VER = """\
             f"{NO_JS}\n{BUNDLED_JS_FILE.import_str}\n{BUNDLED_JS_FILE.import_str}\n{NO_JS}\n{BUNDLED_JS_FILE.import_str}\n{NO_JS}",
             True,
             f"{NO_JS}\n{NO_JS}\n{BUNDLED_JS_FILE.import_str}\n{NO_JS}",
+            True,
+            f"{NO_JS}\n{NO_JS}\n{NO_JS}",
         ),
         (
             # Older version and current version
             f"{NO_JS}\n{OLD_VER}\n{BUNDLED_JS_FILE.import_str}\n{OLD_VER}\n{NO_JS}",
             True,
             f"{NO_JS}\n{BUNDLED_JS_FILE.import_str}\n{NO_JS}",
+            True,
+            f"{NO_JS}\n{NO_JS}",
         ),
         (
             # Newer version
             "<script>\n/* AJT Japanese JS 999.1.1.1 */\n//some new code\n</script>\n<!--whatever-->",
             False,
             None,
+            True,
+            "<!--whatever-->",
         ),
     ],
 )
-def test_js_imports(template_html: str, is_modified: bool, modified_html: Optional[str]) -> None:
+def test_js_imports(
+    template_html: str, is_added: bool, added_html: Optional[str], is_removed: bool, removed_html: Optional[str]
+) -> None:
     side: AnkiCardSide = "qfmt"
-    template_dict: AnkiCardTemplateDict = {side: template_html, "name": "pytest"}
-    assert ensure_js_imported(template_dict, side) is is_modified
-    assert template_dict[side] == (modified_html or template_html)
+
+    def make_template_dict() -> AnkiCardTemplateDict:
+        return {side: template_html, "name": "pytest"}
+
+    template_dict: AnkiCardTemplateDict = make_template_dict()
+    assert ensure_js_imports(template_dict, side, action=ChangeImportsAction.add) is is_added
+    assert template_dict[side] == (added_html or template_html)
+
+    template_dict: AnkiCardTemplateDict = make_template_dict()
+    assert ensure_js_imports(template_dict, side, action=ChangeImportsAction.remove) is is_removed
+    assert template_dict[side] == (removed_html or template_html)
 
 
 @pytest.mark.parametrize(

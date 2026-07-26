@@ -29,6 +29,7 @@ def furigana_dict() -> dict[str, object]:
         "triggered_by": "focus_lost,toolbar_button,note_added,bulk_add",
         "overwrite_destination": False,
         "color_code_pitch": "color",
+        "insert_addon_scripts": False,
     }
 
 
@@ -75,6 +76,7 @@ def test_create_profile_furigana(furigana_dict) -> None:
         assert profile.destination == "ExpressionFurigana"
         assert profile.color_code_pitch == ColorCodePitchFormat.color
         assert profile.triggered_by == TaskCaller.all_enabled()
+        assert profile.insert_addon_scripts is False
 
 
 def test_create_profile_pitch(pitch_dict) -> None:

@@ -1,11 +1,29 @@
 /*
- * AJT Japanese JS 25.4.30.1
+ * AJT Japanese JS 25.11.12.1
  * Copyright: Ajatt-Tools and contributors; https://github.com/Ajatt-Tools
  * License: GNU AGPL, version 3 or later; https://www.gnu.org/licenses/agpl-3.0.html
  */
 
 (function () {
     "use strict";
+
+    const info_title = "詳細";
+    const parts_of_speech = new Map([
+        ["unknown", "unknown"],
+        ["other", "その他"],
+        ["filler", "フィラー"],
+        ["adverb", "副詞"],
+        ["bound_auxiliary", "助動詞"],
+        ["particle", "助詞"],
+        ["verb", "動詞"],
+        ["noun", "名詞"],
+        ["i_adjective", "形容詞"],
+        ["interjection", "感動詞"],
+        ["conjunction", "接続詞"],
+        ["prefix", "接頭詞"],
+        ["symbol", "記号"],
+        ["adnominal_adjective", "連体詞"],
+    ]);
 
     function ajt__kana_to_moras(text) {
         return text.match(/.[°゚]?[ァィゥェォャュョぁぃぅぇぉゃゅょ]?/gu);
@@ -17,37 +35,48 @@
 
     function ajt__make_pattern(kana, pitch_type, pitch_num) {
         const moras = ajt__kana_to_moras(ajt__norm_handakuten(kana));
-        switch (pitch_type) {
-            case "atamadaka":
+        pitch_num = parseInt(pitch_num);
+        switch (true) {
+            case pitch_type == "atamadaka" || pitch_num === 1:
                 return (
                     `<span class="ajt__HL">${moras[0]}</span>` +
                     `<span class="ajt__L">${moras.slice(1).join("")}</span>` +
                     `<span class="ajt__pitch_number_tag">1</span>`
                 );
                 break;
-            case "heiban":
+            case pitch_type == "heiban" || pitch_num === 0:
                 return (
                     `<span class="ajt__LH">${moras[0]}</span>` +
                     `<span class="ajt__H">${moras.slice(1).join("")}</span>` +
                     `<span class="ajt__pitch_number_tag">0</span>`
                 );
                 break;
-            case "odaka":
+            case pitch_type == "odaka" || pitch_num === moras.length:
                 return (
                     `<span class="ajt__LH">${moras[0]}</span>` +
                     `<span class="ajt__HL">${moras.slice(1).join("")}</span>` +
                     `<span class="ajt__pitch_number_tag">${moras.length}</span>`
                 );
                 break;
-            case "nakadaka":
+            case pitch_type == "nakadaka" || pitch_type == "kifuku":
                 return (
                     `<span class="ajt__LH">${moras[0]}</span>` +
-                    `<span class="ajt__HL">${moras.slice(1, Number(pitch_num)).join("")}</span>` +
-                    `<span class="ajt__L">${moras.slice(Number(pitch_num)).join("")}</span>` +
+                    `<span class="ajt__HL">${moras.slice(1, pitch_num).join("")}</span>` +
+                    `<span class="ajt__L">${moras.slice(pitch_num).join("")}</span>` +
+                    `<span class="ajt__pitch_number_tag">${pitch_num}</span>`
+                );
+                break;
+            default:
+                return (
+                    `<span>Error: ${kana} (${pitch_type})</span>` +
                     `<span class="ajt__pitch_number_tag">${pitch_num}</span>`
                 );
                 break;
         }
+        return (
+            `<span>Fatal error: ${kana} (${pitch_type})</span>` +
+            `<span class="ajt__pitch_number_tag">${pitch_num}</span>`
+        );
     }
 
     function ajt__format_new_ruby(kanji, readings) {
@@ -90,11 +119,20 @@
         return accents;
     }
 
-    function ajt__make_popup_div(content) {
+    function ajt__find_word_info_title(ajt_span) {
+        const headword = ajt_span.getAttribute("headword") || info_title;
+        const pos_ja = parts_of_speech.get(ajt_span.getAttribute("part_of_speech") || "unknown");
+        if (!pos_ja || pos_ja == "unknown") {
+            return headword;
+        }
+        return `${headword}・${pos_ja}`;
+    }
+
+    function ajt__make_popup_div(headword_info, content) {
         /* Popup Top frame */
         const frame_top = document.createElement("div");
         frame_top.classList.add("ajt__frame_title");
-        frame_top.innerText = "Information";
+        frame_top.innerText = `${headword_info}`;
 
         /* Popup Content */
         const frame_bottom = document.createElement("div");
@@ -194,7 +232,7 @@
                     // If the word has a lot of readings, show them on mouseover.
                     // Don't add popups to color-coded blocks of text. They already have their own popups.
                     const content_ul = ajt__format_readings_as_list(readings);
-                    const popup = ajt__make_popup_div(content_ul);
+                    const popup = ajt__make_popup_div(info_title, content_ul);
                     const wrapper = document.createElement("span");
                     ruby.replaceWith(wrapper);
                     wrapper.appendChild(ruby);
@@ -219,8 +257,9 @@
                 continue;
             }
             try {
+                const info_title = ajt__find_word_info_title(span);
                 const content_ul = ajt__make_accents_list(span);
-                const popup = ajt__make_popup_div(content_ul);
+                const popup = ajt__make_popup_div(info_title, content_ul);
                 popup.setAttribute("ajt__popup_idx", idx);
                 span.setAttribute("ajt__popup_idx", idx);
                 span.appendChild(popup);

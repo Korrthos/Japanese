@@ -132,6 +132,8 @@ Parameters:
   you can disable the script loading
   (and then remove the added scripts from your card templates).
 
+  This setting is now controlled per-profile and will be removed in the future.
+
 ****
 
 If you enjoy this add-on,

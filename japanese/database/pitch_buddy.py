@@ -77,7 +77,10 @@ class PitchSqlite3Buddy(Sqlite3BuddyABC, abc.ABC):
 
     def get_pitch_accents_headword_count(self) -> int:
         query = """
-        SELECT COUNT(DISTINCT headword) FROM pitch_accents_formatted;
+        SELECT
+            COUNT(DISTINCT raw_headword)
+        FROM
+            pitch_accents_formatted;
         """
         with cursor_buddy(self.con) as cur:
             result = cur.execute(query).fetchone()

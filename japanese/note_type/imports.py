@@ -17,8 +17,13 @@ from .bundled_files import (
     FileVersionTuple,
     version_str_to_tuple,
 )
+from .types import ChangeImportsAction
 
 RE_AJT_CSS_IMPORT = re.compile(r'@import url\("_ajt_japanese(?:_(?P<version>\d+\.\d+\.\d+\.\d+))?\.css"\);')
+
+# Used to remove CSS imports, thus contains a trailing newline.
+RE_AJT_CSS_IMPORT_SIMPLE = re.compile(r'@import url\("_ajt_japanese[^()"\']*\.css"\);\n?')
+
 RE_AJT_JS_LEGACY_IMPORT = re.compile(r'<script [^<>]*src="_ajt_japanese[^"]*\.js"></script>\n?')
 RE_AJT_JS_VERSION_COMMENT = re.compile(r"\s*/\* AJT Japanese JS (?P<version>\d+\.\d+\.\d+\.\d+) \*/\n?")
 RE_CHARSET_RULE = re.compile(r'@charset "UTF-8";\n?', flags=re.MULTILINE | re.IGNORECASE)
@@ -122,15 +127,31 @@ def ensure_css_in_card(css_styling: str) -> str:
     return css_styling
 
 
-def ensure_css_imported(model_dict: AnkiNoteTypeDict) -> bool:
+def remove_css_import(css_template: str) -> str:
+    return re.sub(RE_AJT_CSS_IMPORT_SIMPLE, "", css_template)
+
+
+def ensure_css_imports(model_dict: AnkiNoteTypeDict, action: ChangeImportsAction) -> bool:
     """
     Takes a model (note type) and ensures that it imports the bundled CSS file.
     Returns True if the model has been modified and Anki needs to save the changes.
     """
-    if (updated_css := ensure_css_in_card(model_dict["css"])) != model_dict["css"]:
+    if action == ChangeImportsAction.add:
+        updated_css = ensure_css_in_card(model_dict["css"])
+    elif action == ChangeImportsAction.remove:
+        updated_css = remove_css_import(model_dict["css"])
+    else:
+        raise ValueError(f"invalid action: {action}")
+
+    if updated_css != model_dict["css"]:
         model_dict["css"] = updated_css
-        print(f"Model '{model_dict['name']}': new CSS has been linked.")
+        print(
+            f"Model '{model_dict['name']}': CSS has been"
+            f" {'updated' if action == ChangeImportsAction.add else 'trimmed'}."
+        )
         return True
+    else:
+        print(f"Model '{model_dict['name']}': CSS template unchanged.")
     return False
 
 
@@ -159,16 +180,38 @@ def ensure_js_in_card_side(html_template: str) -> str:
     return html_template
 
 
-def ensure_js_imported(template: AnkiCardTemplateDict, side: AnkiCardSide) -> bool:
+def remove_js_imports(html_template: str) -> str:
+    # Replace legacy import (if present)
+    html_template = re.sub(RE_AJT_JS_LEGACY_IMPORT, "", html_template)
+    # Iterate in reverse to prevent deleting from the beginning and corrupting other ranges.
+    for existing_import in reversed(tuple(find_ajt_japanese_js_imports(html_template))):
+        # Remove every import found.
+        html_template = html_template[: existing_import.start_idx] + html_template[existing_import.end_idx :]
+    return html_template.strip()
+
+
+def ensure_js_imports(template: AnkiCardTemplateDict, side: AnkiCardSide, action: ChangeImportsAction) -> bool:
     """
     Takes a card template (from a note type) and ensures that it imports the bundled JS file.
     Returns True if the template has been modified and Anki needs to save the changes.
     """
-    if (template_text := ensure_js_in_card_side(template[side])) != template[side]:
+    if action == ChangeImportsAction.add:
+        updated_template = ensure_js_in_card_side(template[side])
+    elif action == ChangeImportsAction.remove:
+        updated_template = remove_js_imports(template[side])
+    else:
+        raise ValueError(f"invalid action: {action}")
+
+    if updated_template != template[side]:
         # Template was modified
-        template[side] = template_text
-        print(f"Template '{template['name']}': new JS has been linked.")
+        template[side] = updated_template
+        print(
+            f"Template '{template['name']}': JS has been "
+            f" {'updated' if action == ChangeImportsAction.add else 'trimmed'}."
+        )
         return True
+    else:
+        print(f"Template '{template['name']}': JS unchanged.")
     return False
 
 

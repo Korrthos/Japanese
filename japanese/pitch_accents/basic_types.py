@@ -6,7 +6,7 @@ import enum
 from collections.abc import MutableSequence, Sequence
 from typing import NamedTuple
 
-from ..mecab_controller.basic_types import MecabParsedToken
+from ..mecab_controller.basic_types import MecabParsedToken, PartOfSpeech
 from .common import (
     FormattedEntry,
     nakaten_separated_katakana_reading,
@@ -32,13 +32,9 @@ class PitchType(enum.Enum):
 
 
 @enum.unique
-class PitchColor(enum.Enum):
-    heiban = "#3366CC"  # blue
-    atamadaka = "red"
-    nakadaka = "#eb8500"  # orange
-    odaka = "green"
-    kifuku = "purple"
-    unknown = "#5f5f5f"
+class PitchUnknown(enum.Enum):
+    many = enum.auto()
+    none = enum.auto()
 
 
 def pitch_type_from_pitch_num(pitch_num_as_str: str, n_moras: int) -> PitchType:
@@ -51,9 +47,12 @@ def pitch_type_from_pitch_num(pitch_num_as_str: str, n_moras: int) -> PitchType:
         # pitch num is not a number => pitch is unknown
         return PitchType.unknown
 
-    assert pitch_num >= 0, "pitch number can't be less than 0"
-    assert n_moras > 0, "word must consist of at least 1 mora"
-    assert pitch_num <= n_moras, "pitch must drop inside the word or right after"
+    if pitch_num < 0:
+        raise ValueError("pitch number can't be less than 0")
+    if n_moras < 1:
+        raise ValueError("word must consist of at least 1 mora")
+    if pitch_num > n_moras:
+        raise ValueError("pitch must drop inside the word or right after")
 
     if pitch_num == 0:
         return PitchType.heiban
@@ -70,25 +69,49 @@ def count_moras(katakana_reading: str) -> int:
     return sum(1 for char in katakana_reading if char not in SMALL_KANA_CHARS)
 
 
+def is_verb_or_i_adjective(part_of_speech: PartOfSpeech) -> bool:
+    assert isinstance(part_of_speech, PartOfSpeech), f"expected PartOfSpeech, got {type(part_of_speech)}"
+    return part_of_speech in (PartOfSpeech.verb, PartOfSpeech.i_adjective)
+
+
+def adjust_if_kifuku(part_of_speech: PartOfSpeech, pitch_type: PitchType) -> PitchType:
+    """
+    non-heiban verbs and i-adjectives are commonly referred to as kifuku.
+    """
+    assert isinstance(pitch_type, PitchType), f"expected PitchType, got {type(pitch_type)}"
+    if (
+        pitch_type
+        and is_verb_or_i_adjective(part_of_speech)
+        and pitch_type not in (PitchType.heiban, PitchType.unknown)
+    ):
+        return PitchType.kifuku
+    return pitch_type
+
+
 class PitchParam(NamedTuple):
     type: PitchType
     number: str
+    n_moras: int
 
     def describe(self):
         """
         Returns pattern name if not nakadaka: unknown, heiban, atamadaka, odaka, kifuku.
         Otherwise, returns pattern + pitch number: nakadaka-2, nakadaka-3, etc.
         """
-        if self.type == PitchType.nakadaka:
+        if self.type in (PitchType.nakadaka, PitchType.kifuku):
+            # kifuku can be atamadaka, nakadaka or odaka.
+            # always print its pitch number to help the JS script figure out how to draw the pitch graph.
             return f"{self.type.name}{SEP_PITCH_TYPE_NUM}{self.number}"
         else:
             return self.type.name
 
     @classmethod
-    def from_symbol(cls, katakana_reading: str, pitch_num_as_str: str):
+    def from_symbol(cls, katakana_reading: str, pitch_num_as_str: str, part_of_speech: PartOfSpeech):
+        n_moras = count_moras(katakana_reading)
         return cls(
-            type=pitch_type_from_pitch_num(pitch_num_as_str, n_moras=count_moras(katakana_reading)),
+            type=adjust_if_kifuku(part_of_speech, pitch_type_from_pitch_num(pitch_num_as_str, n_moras=n_moras)),
             number=pitch_num_as_str,
+            n_moras=n_moras,
         )
 
 
@@ -115,7 +138,7 @@ class PitchAccentEntry(NamedTuple):
         )
 
     @classmethod
-    def from_formatted(cls, entry: FormattedEntry) -> "PitchAccentEntry":
+    def from_formatted(cls, entry: FormattedEntry, part_of_speech: PartOfSpeech) -> "PitchAccentEntry":
         """
         Construct cls from a dictionary entry.
 
@@ -127,7 +150,7 @@ class PitchAccentEntry(NamedTuple):
             katakana_reading=entry.katakana_reading,
             katakana_reading_sep=nakaten_separated_katakana_reading(entry.html_notation),
             pitches=[
-                PitchParam.from_symbol(entry.katakana_reading, symbol)
+                PitchParam.from_symbol(entry.katakana_reading, symbol, part_of_speech)
                 for symbol in split_pitch_numbers(entry.pitch_number)
             ],
         )
@@ -154,3 +177,12 @@ class AccDbParsedToken(MecabParsedToken):
 
     def has_pitch(self) -> bool:
         return bool(self.headword_accents and all(token.has_accent() for token in self.headword_accents))
+
+    @classmethod
+    def from_mecab_parsed(
+        cls, mpt: MecabParsedToken, headword_accents: Sequence[PitchAccentEntry]
+    ) -> "AccDbParsedToken":
+        return cls(
+            **dataclasses.asdict(mpt),
+            headword_accents=headword_accents,
+        )

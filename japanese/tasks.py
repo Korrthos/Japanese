@@ -2,19 +2,18 @@
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
 import functools
-import io
 from collections.abc import Iterable
 from typing import Optional
 
 import anki.collection
 from anki import hooks
 from anki.decks import DeckId
-from anki.models import NotetypeDict
 from anki.notes import Note
 from anki.utils import strip_html_media
 from aqt import mw
 from aqt.utils import tooltip
 
+from .ajt_common.model_utils import AnkiNoteTypeDict
 from .audio import aud_src_mgr, format_audio_tags
 from .audio_manager.download_results import (
     FileSaveResults,
@@ -36,7 +35,7 @@ from .pitch_accents.accent_lookup import AccentLookup
 from .reading import fgen, format_pronunciations, lookup
 
 
-def note_type_matches(note_type: NotetypeDict, profile: Profile) -> bool:
+def note_type_matches(note_type: AnkiNoteTypeDict, profile: Profile) -> bool:
     return profile.note_type.lower() in note_type["name"].lower()
 
 

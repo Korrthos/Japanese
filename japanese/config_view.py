@@ -16,6 +16,7 @@ from .helpers.profiles import Profile
 from .helpers.sakura_client import AddDefBehavior, DictName, SearchType
 from .helpers.tokens import RE_FLAGS
 from .mecab_controller.kana_conv import to_katakana
+from .pitch_accents.basic_types import PitchType
 from .pitch_accents.styles import HTMLPitchPatternStyle
 
 RE_CFG_WORD_SEP = re.compile(r"[\n;、, ]+", flags=RE_FLAGS)
@@ -82,6 +83,10 @@ class FuriganaConfigView(PitchAndFuriganaCommon):
     @property
     def maximum_pitch_accents(self) -> int:
         return int(self["maximum_pitch_accents"])
+
+    @property
+    def color_code_kifuku(self) -> bool:
+        return bool(self["color_code_kifuku"])
 
 
 @enum.unique
@@ -394,10 +399,36 @@ class SvgPitchGraphOptionsConfigView(ConfigSubViewBase):
     graph_font: str = "Noto Sans, Noto Sans CJK JP, IPAexGothic, IPAPGothic, IPAGothic, Yu Gothic, Sans, Sans-Serif"
 
 
+@final
+class PitchColorCodesConfigView(ConfigSubViewBase):
+    _view_key: str = "pitch_color_codes"
+
+    def lookup_color(self, pitch_type: PitchType) -> str:
+        """
+        Same as __getitem__ but returns the unknown color if can't lookup.
+        """
+        try:
+            return self[pitch_type]
+        except KeyError:
+            return self[PitchType.unknown]
+
+    def __getitem__(self, pitch_type: PitchType) -> str:
+        """
+        Input: pitch type, e.g. "heiban"
+        Output: pitch color defined by the user in the config file, e.g. "blue"
+        """
+        return super().__getitem__(pitch_type.name)
+
+    @property
+    def unknown(self) -> str:
+        return self[PitchType.unknown]
+
+
 class JapaneseConfig(AddonConfigManager):
     def __init__(self, default: bool = False) -> None:
         super().__init__(default)
         self._furigana = FuriganaConfigView(self)
+        self._pitch_color_codes = PitchColorCodesConfigView(self)
         self._pitch = PitchConfigView(self)
         self._context_menu = ContextMenuConfigView(self)
         self._toolbar = ToolbarConfigView(self)
@@ -436,6 +467,10 @@ class JapaneseConfig(AddonConfigManager):
     @property
     def furigana(self) -> FuriganaConfigView:
         return self._furigana
+
+    @property
+    def pitch_color_codes(self) -> PitchColorCodesConfigView:
+        return self._pitch_color_codes
 
     @property
     def pitch_accent(self) -> PitchConfigView:

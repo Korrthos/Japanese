@@ -181,6 +181,7 @@ class ProfilePitch(Profile, mode="pitch"):
 @dataclasses.dataclass(frozen=True)
 class ProfileFurigana(Profile, mode="furigana"):
     color_code_pitch: ColorCodePitchFormat
+    insert_addon_scripts: bool  # see the "note_type" module.
 
     @classmethod
     def new(cls):
@@ -188,6 +189,7 @@ class ProfileFurigana(Profile, mode="furigana"):
             source="VocabKanji",
             destination="VocabFurigana",
             color_code_pitch=ColorCodePitchFormat(0),
+            insert_addon_scripts=True,
         )
 
     def as_config_dict(self) -> dict[str, typing.Union[str, bool]]:

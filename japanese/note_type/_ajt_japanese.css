@@ -1,5 +1,5 @@
 /*
- * AJT Japanese CSS 25.4.30.1
+ * AJT Japanese CSS 25.11.12.1
  * Copyright: Ajatt-Tools and contributors; https://github.com/Ajatt-Tools
  * License: GNU AGPL, version 3 or later; https://www.gnu.org/licenses/agpl-3.0.html
  */
@@ -119,7 +119,7 @@ ol.ajt__readings_list {
 }
 
 .ajt__frame_title {
-    /* Title bar (says "Information") */
+    /* Title bar (says "Information" or prints the current word and its part of speech) */
     text-align: center;
     background-color: rgb(197, 197, 197);
     font-size: 1rem;
@@ -159,6 +159,9 @@ ol.ajt__readings_list {
 }
 .ajt__downstep_nakadaka {
     --downstep-color: #eb8500;
+}
+.ajt__downstep_kifuku {
+    --downstep-color: purple;
 }
 
 /* Downstep lines. */

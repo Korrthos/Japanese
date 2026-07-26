@@ -56,8 +56,8 @@ python = ["3.9", ]
 check = "mypy --install-types --non-interactive {args:japanese tests}"
 test = "pytest"
 testv = "pytest -vvv -s"
-format = "bash \"$(git rev-parse --show-toplevel)/scripts/format.sh\" "
-package = "bash \"$(git rev-parse --show-toplevel)/scripts/package.sh\" "
+format = "$(git rev-parse --show-toplevel)/scripts/format.sh"
+package = "$(git rev-parse --show-toplevel)/scripts/package.sh"
 
 [tool.coverage.run]
 source_pkgs = ["japanese", "tests"]

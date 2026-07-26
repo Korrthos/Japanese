@@ -56,6 +56,7 @@ from .widgets.settings_form import (
     ContextMenuSettingsForm,
     ForvoSettingsForm,
     FuriganaSettingsForm,
+    PitchColorCodesSettingsForm,
     PitchSettingsForm,
     SettingsForm,
 )
@@ -257,15 +258,24 @@ class FuriganaProfileEditForm(ProfileEditForm, profile_class=ProfileFurigana):
     def _expand_form(self) -> None:
         super()._expand_form()
         self._form.color_code_pitch = FlagSelectCombo(enum_type=ColorCodePitchFormat)
+        self._form.insert_addon_scripts = QCheckBox()
 
     def load_profile(self, profile: ProfileFurigana) -> None:
         super().load_profile(profile)
         self._form.color_code_pitch.set_checked_flags(profile.color_code_pitch)
+        self._form.insert_addon_scripts.setChecked(profile.insert_addon_scripts)
 
     def _add_tooltips(self) -> None:
         super()._add_tooltips()
         self._form.color_code_pitch.setToolTip(
             "One or more variants to color-code pitch accents in words or sentences."
+        )
+        self._form.insert_addon_scripts.setToolTip(
+            "The add-on inserts additional JavaScript and CSS code into the card templates\n"
+            "to enable correct display of furigana for words with multiple readings,\n"
+            "and to show pitch accent information on mouse hover.\n\n"
+            'It is recommended to always enable this setting if "Color code pitch" is enabled for the profile\n'
+            'and/or if the "Maximum results" parameter is greater than 1.'
         )
 
 
@@ -547,6 +557,25 @@ class AudioSourcesEditTable(QWidget):
         self._apply_button.setToolTip("Apply current sources configuration.")
 
 
+class PitchStatsLabel(QLabel):
+    def __init__(self) -> None:
+        super().__init__()
+        self._populate()
+
+    def _populate(self) -> None:
+        assert mw
+        QueryOp(
+            parent=mw,
+            op=lambda collection: acc_dict.get_headword_count_op(),
+            success=lambda headword_count: self._update_label_text(headword_count),
+        ).without_collection().run_in_background()
+
+    def _update_label_text(self, headword_count: int) -> None:
+        if is_obj_deleted(self):
+            return
+        self.setText(f"AJT Japanese knows pitch accents of {headword_count} words.")
+
+
 @final
 class SettingsDialog(AnkiSaveAndRestoreGeomDialog, MgrPropMixIn):
     name: str = "ajt__japanese_options"
@@ -557,11 +586,13 @@ class SettingsDialog(AnkiSaveAndRestoreGeomDialog, MgrPropMixIn):
         # Furigana tab
         self._furigana_profiles_edit = FuriganaProfilesEdit()
         self._furigana_settings = GroupBoxWrapper(FuriganaSettingsForm(cfg.furigana))
+        self._color_codes_settings = GroupBoxWrapper(PitchColorCodesSettingsForm(cfg.pitch_color_codes))
 
         # Pitch tab
         self._pitch_profiles_edit = PitchProfilesEdit()
         self._pitch_settings = GroupBoxWrapper(PitchSettingsForm(cfg.pitch_accent))
         self._svg_settings = SvgSettingsWidget(cfg.svg_graphs)
+        self._pitch_stats_label = PitchStatsLabel()
 
         # Audio tab
         self._audio_profiles_edit = AudioProfilesEdit()
@@ -596,9 +627,14 @@ class SettingsDialog(AnkiSaveAndRestoreGeomDialog, MgrPropMixIn):
     def _setup_tabs(self) -> None:
         # Furigana
         tab = QWidget()
-        tab.setLayout(layout := QVBoxLayout())
-        layout.addWidget(self._furigana_profiles_edit)
-        layout.addWidget(self._furigana_settings)
+        tab.setLayout(layout := QGridLayout())
+        # int fromRow, int fromColumn, int rowSpan, int columnSpan
+        layout.addWidget(self._furigana_profiles_edit, 0, 0, 1, -1)
+        layout.addWidget(self._furigana_settings, 1, 0)
+        layout.addWidget(self._color_codes_settings, 1, 1)
+        # Note: furigana takes more space than pitch colors.
+        layout.setColumnStretch(0, 3)
+        layout.setColumnStretch(1, 1)
         self._tabs.addTab(tab, "Furigana")
 
         # Pitch accent
@@ -606,6 +642,7 @@ class SettingsDialog(AnkiSaveAndRestoreGeomDialog, MgrPropMixIn):
         tab.setLayout(layout := QVBoxLayout())
         layout.addWidget(self._pitch_profiles_edit)
         layout.addWidget(self._pitch_settings)
+        layout.addWidget(self._pitch_stats_label)
         self._tabs.addTab(tab, "Pitch accent")
 
         # SVG settings
@@ -668,6 +705,7 @@ class SettingsDialog(AnkiSaveAndRestoreGeomDialog, MgrPropMixIn):
         cfg["pitch_accent"].update(self._pitch_settings.as_dict())
         cfg["svg_graphs"].update(self._svg_settings.as_dict())
         cfg["furigana"].update(self._furigana_settings.as_dict())
+        cfg["pitch_color_codes"].update(self._color_codes_settings.as_dict())
         cfg["context_menu"].update(self._context_menu_settings.as_dict())
         cfg["forvo"].update(self._forvo_settings.as_dict())
         cfg["toolbar"].update(self._toolbar_settings.as_dict())

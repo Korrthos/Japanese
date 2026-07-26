@@ -9,6 +9,7 @@ from aqt.qt import *
 
 from ..ajt_common.addon_config import ConfigSubViewBase
 from ..ajt_common.anki_field_selector import AnkiFieldSelector
+from ..ajt_common.color_picker import ColorEditPicker
 from ..ajt_common.enum_select_combo import EnumSelectCombo
 from ..ajt_common.grab_key import ShortCutGrabButton
 from ..ajt_common.utils import q_emit, ui_translate
@@ -18,11 +19,13 @@ from ..config_view import (
     DefinitionsConfigView,
     ForvoSettingsConfigView,
     FuriganaConfigView,
+    PitchColorCodesConfigView,
     PitchConfigView,
     SvgPitchGraphOptionsConfigView,
 )
 from ..helpers.misc import split_list
 from ..helpers.sakura_client import AddDefBehavior, DictName, SearchType
+from ..pitch_accents.basic_types import PitchType
 from ..pitch_accents.styles import HTMLPitchPatternStyle
 from .addon_opts import (
     NarrowLineEdit,
@@ -222,9 +225,45 @@ class PitchSettingsForm(MultiColumnSettingsForm):
         )
 
 
+class PitchColorCodesSettingsForm(SettingsForm):
+    _title: str = "Pitch Colors"
+    _config: PitchColorCodesConfigView
+
+    def _make_color_line_edits(self) -> Iterable[tuple[str, ColorEditPicker]]:
+        assert self._config
+        for pitch_type in PitchType:
+            picker = ColorEditPicker()
+            picker.setText(self._config.lookup_color(pitch_type))
+            yield pitch_type.name, picker
+
+    def _add_widgets(self) -> None:
+        super()._add_widgets()
+        self._widgets.__dict__.update(self._make_color_line_edits())
+
+    def _add_tooltips(self) -> None:
+        super()._add_tooltips()
+        self._widgets.heiban.setToolTip(
+            "Flat pitch pattern.\n"
+            "The first mora is pronounced with a low pitch,\n"
+            "while all subsequent moras are pronounced with a high pitch."
+        )
+        self._widgets.atamadaka.setToolTip(
+            "The first mora is high,\nand then all subsequent moras are pronounced with a low pitch."
+        )
+        self._widgets.nakadaka.setToolTip(
+            "The first mora is low,\nthe pitch drops from high to low at some point before the word ends."
+        )
+        self._widgets.odaka.setToolTip(
+            "The first mora is low (unless the word only has a single mora),\n"
+            "then the pitch rises and remains high until the end of the word.\n"
+            "Any particle following the word has a low pitch."
+        )
+
+
 class FuriganaSettingsForm(MultiColumnSettingsForm):
     _title: str = "Furigana Options"
     _config: FuriganaConfigView
+    _columns: int = 2
 
     def _add_widgets(self) -> None:
         super()._add_widgets()
@@ -236,6 +275,10 @@ class FuriganaSettingsForm(MultiColumnSettingsForm):
 
     def _add_tooltips(self) -> None:
         super()._add_tooltips()
+        self._widgets.color_code_kifuku.setToolTip(
+            "Non-heiban verbs and i-adjectives are sometimes referred to as Kifuku.\n"
+            "This setting allows painting them with a unique color."
+        )
         self._widgets.skip_numbers.setToolTip("Don't add furigana to numbers.")
         self._widgets.prefer_literal_pronunciation.setToolTip(
             "Print furigana in a way that shows a word's literal pronunciation."

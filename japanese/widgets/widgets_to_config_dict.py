@@ -3,6 +3,7 @@
 
 from aqt.qt import *
 
+from ..ajt_common.color_picker import ColorEditPicker
 from ..ajt_common.enum_select_combo import EnumSelectCombo
 from ..ajt_common.grab_key import ShortCutGrabButton
 from ..widgets.addon_opts import WordsEdit
@@ -12,7 +13,9 @@ from .enum_selector import FlagSelectCombo
 def as_config_dict(widgets: dict[str, QWidget]) -> dict[str, Union[bool, str, int]]:
     d = {}
     for key, widget in widgets.items():
-        if isinstance(widget, FlagSelectCombo):
+        if isinstance(widget, ColorEditPicker):
+            d[key] = widget.text()
+        elif isinstance(widget, FlagSelectCombo):
             d[key] = widget.comma_separated_flags()
         elif isinstance(widget, EnumSelectCombo):
             d[key] = widget.currentName()

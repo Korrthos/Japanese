@@ -1,6 +1,9 @@
 [submodule "addon/ajt_common"]
 	path = japanese/ajt_common
-	url = https://github.com/Ajatt-Tools/ajt_common.git
+	url = git@github.com:Ajatt-Tools/ajt_common.git
 [submodule "addon/mecab_controller"]
 	path = japanese/mecab_controller
 	url = https://github.com/Korrthos/mecab_controller.git
+[submodule "kanjigrid"]
+	path = kanjigrid
+	url = git@github.com:Ajatt-Tools/kanjigrid.git

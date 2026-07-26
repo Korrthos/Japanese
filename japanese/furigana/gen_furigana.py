@@ -66,7 +66,7 @@ class FuriganaGen:
             elif acc_db_result := tuple(self.try_lookup_full_text(token)):
                 # If full text search succeeded, continue.
                 substrings.extend(acc_db_result)
-            elif split_morphemes is True:
+            elif split_morphemes:
                 # Split with mecab, format furigana for each word.
                 substrings.extend(self.append_accents(out) for out in self._mecab.translate(token))
             elif out := self.mecab_single_word(token):
@@ -84,7 +84,7 @@ class FuriganaGen:
             )
         ).strip()
 
-    def mecab_single_word(self, token: Token) -> Optional[MecabParsedToken]:
+    def mecab_single_word(self, token: str) -> Optional[MecabParsedToken]:
         if (out := self._mecab.translate(token)) and out[0].word == token:
             return out[0]
         return None
@@ -177,7 +177,7 @@ class FuriganaGen:
 
         return self.format_furigana_readings(out.word, readings)
 
-    def try_lookup_full_text(self, text: str) -> Iterable[AccDbParsedToken]:
+    def try_lookup_full_text(self, text: Token) -> Iterable[AccDbParsedToken]:
         """
         Try looking up whole text in the accent db.
         Avoids calling mecab when the text contains one word in dictionary form
@@ -192,22 +192,35 @@ class FuriganaGen:
 
         if results := self._lookup.get_pronunciations(text, recurse=False):
             for word, entries in results.items():
-                yield AccDbParsedToken(
-                    headword=word,
-                    word=word,
-                    part_of_speech=PartOfSpeech.unknown,
-                    inflection_type=Inflection.dictionary_form,
-                    katakana_reading=None,
-                    headword_accents=self.unique_headword_accents(entries),
-                )
+                if info_single := self.mecab_single_word(word):
+                    # Find part of speech.
+                    yield AccDbParsedToken.from_mecab_parsed(
+                        info_single,
+                        headword_accents=self.unique_headword_accents(
+                            entries, part_of_speech=info_single.part_of_speech
+                        ),
+                    )
+                else:
+                    # Part of speech will not be set.
+                    yield AccDbParsedToken(
+                        headword=word,
+                        word=word,
+                        part_of_speech=PartOfSpeech.unknown,
+                        inflection_type=Inflection.dictionary_form,
+                        katakana_reading=None,
+                        headword_accents=self.unique_headword_accents(entries, part_of_speech=PartOfSpeech.unknown),
+                    )
 
     def append_accents(self, token: MecabParsedToken) -> AccDbParsedToken:
         """
         Append readings from the accent dictionary to the reading given by mecab.
         """
-        return AccDbParsedToken(
-            **dataclasses.asdict(token),
-            headword_accents=self.unique_headword_accents(self.iter_accents(token.headword)),
+        return AccDbParsedToken.from_mecab_parsed(
+            token,
+            headword_accents=self.unique_headword_accents(
+                self.iter_accents(token.headword),
+                part_of_speech=token.part_of_speech,
+            ),
         )
 
     def _is_reading_preferable(self, reading: str) -> bool:
@@ -229,12 +242,16 @@ class FuriganaGen:
                 key_to_entry[access_key(entry)] = entry
         return key_to_entry.values()
 
-    def unique_headword_accents(self, entries: Iterable[FormattedEntry]) -> Sequence[PitchAccentEntry]:
+    def unique_headword_accents(
+        self, entries: Iterable[FormattedEntry], part_of_speech: PartOfSpeech
+    ) -> Sequence[PitchAccentEntry]:
         """
         Returns a list of pitch accents without duplicates.
         """
+        if not self._cfg.furigana.color_code_kifuku:
+            part_of_speech = PartOfSpeech.unknown
         return [
-            PitchAccentEntry.from_formatted(entry)
+            PitchAccentEntry.from_formatted(entry, part_of_speech)
             for entry in self._to_unique_readings(
                 entries,
                 access_key=lambda entry: (pr(entry.katakana_reading), entry.pitch_number),
